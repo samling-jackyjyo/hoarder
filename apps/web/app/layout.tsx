@@ -5,14 +5,9 @@ import "@hoarder/tailwind-config/globals.css";
 
 import type { Viewport } from "next";
 import React from "react";
-import { cookies } from "next/headers";
 import { Toaster } from "@/components/ui/toaster";
 import Providers from "@/lib/providers";
-import {
-  defaultUserLocalSettings,
-  parseUserLocalSettings,
-  USER_LOCAL_SETTINGS_COOKIE_NAME,
-} from "@/lib/userLocalSettings/types";
+import { getUserLocalSettings } from "@/lib/userLocalSettings/userLocalSettings";
 import { getServerAuthSession } from "@/server/auth";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -51,17 +46,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerAuthSession();
+  const userSettings = await getUserLocalSettings();
+  const isRTL = userSettings.lang === "ar";
   return (
-    <html lang="en">
+    <html lang={userSettings.lang} dir={isRTL ? "rtl" : "ltr"}>
       <body className={inter.className}>
         <Providers
           session={session}
           clientConfig={clientConfig}
-          userLocalSettings={
-            parseUserLocalSettings(
-              cookies().get(USER_LOCAL_SETTINGS_COOKIE_NAME)?.value,
-            ) ?? defaultUserLocalSettings()
-          }
+          userLocalSettings={await getUserLocalSettings()}
         >
           {children}
           <ReactQueryDevtools initialIsOpen={false} />

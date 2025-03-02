@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import UploadDropzone from "@/components/dashboard/UploadDropzone";
+import { useSortOrderStore } from "@/lib/store/useSortOrderStore";
 import { api } from "@/lib/trpc";
 
 import type {
@@ -16,14 +18,18 @@ export default function UpdatableBookmarksGrid({
   bookmarks: initialBookmarks,
   showEditorCard = false,
 }: {
-  query: ZGetBookmarksRequest;
+  query: Omit<ZGetBookmarksRequest, "sortOrder">; // Sort order is handled by the store
   bookmarks: ZGetBookmarksResponse;
   showEditorCard?: boolean;
   itemsPerPage?: number;
 }) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const sortOrder = useSortOrderStore((state) => state.sortOrder);
+
+  const finalQuery = { ...query, sortOrder };
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     api.bookmarks.getBookmarks.useInfiniteQuery(
-      { ...query, useCursorV2: true },
+      { ...finalQuery, useCursorV2: true },
       {
         initialData: () => ({
           pages: [initialBookmarks],
@@ -31,21 +37,26 @@ export default function UpdatableBookmarksGrid({
         }),
         initialCursor: null,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
+        refetchOnMount: true,
       },
     );
+
+  useEffect(() => {
+    refetch();
+  }, [sortOrder, refetch]);
 
   const grid = (
     <BookmarksGrid
       bookmarks={data!.pages.flatMap((b) => b.bookmarks)}
       hasNextPage={hasNextPage}
-      fetchNextPage={() => fetchNextPage()}
+      fetchNextPage={fetchNextPage}
       isFetchingNextPage={isFetchingNextPage}
       showEditorCard={showEditorCard}
     />
   );
 
   return (
-    <BookmarkGridContextProvider query={query}>
+    <BookmarkGridContextProvider query={finalQuery}>
       {showEditorCard ? <UploadDropzone>{grid}</UploadDropzone> : grid}
     </BookmarkGridContextProvider>
   );

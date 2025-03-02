@@ -3,11 +3,13 @@ import { count, eq, sum } from "drizzle-orm";
 import { z } from "zod";
 
 import { assets, bookmarkLinks, bookmarks, users } from "@hoarder/db/schema";
+import serverConfig from "@hoarder/shared/config";
 import {
   LinkCrawlerQueue,
   OpenAIQueue,
   SearchIndexingQueue,
   TidyAssetsQueue,
+  triggerReprocessingFixMode,
   triggerSearchReindex,
 } from "@hoarder/shared/queues";
 import {
@@ -153,6 +155,15 @@ export const adminAppRouter = router({
 
     await Promise.all(bookmarkIds.map((b) => triggerSearchReindex(b.id)));
   }),
+  reprocessAssetsFixMode: adminProcedure.mutation(async ({ ctx }) => {
+    const bookmarkIds = await ctx.db.query.bookmarkAssets.findMany({
+      columns: {
+        id: true,
+      },
+    });
+
+    await Promise.all(bookmarkIds.map((b) => triggerReprocessingFixMode(b.id)));
+  }),
   reRunInferenceOnAllBookmarks: adminProcedure
     .input(
       z.object({
@@ -276,5 +287,16 @@ export const adminAppRouter = router({
           message: "User not found",
         });
       }
+    }),
+  getAdminNoticies: adminProcedure
+    .output(
+      z.object({
+        legacyContainersNotice: z.boolean(),
+      }),
+    )
+    .query(() => {
+      return {
+        legacyContainersNotice: serverConfig.usingLegacySeparateContainers,
+      };
     }),
 });

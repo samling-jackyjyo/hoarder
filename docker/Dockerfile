@@ -4,7 +4,9 @@ FROM node:22-alpine AS base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+
+# https://github.com/hoarder-app/hoarder/issues/967
+RUN npm install -g corepack@0.31.0 && corepack enable
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat make g++ py3-pip linux-headers
@@ -12,7 +14,7 @@ RUN apk add --no-cache libc6-compat make g++ py3-pip linux-headers
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV PUPPETEER_SKIP_DOWNLOAD true
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Build the db migration script
 RUN cd packages/db && \
@@ -24,7 +26,7 @@ RUN cd packages/db && \
 RUN (cd apps/web && pnpm exec next build --experimental-build-mode compile)
 
 # Build the worker code
-RUN --mount=type=cache,id=pnpm_workers,target=/pnpm/store pnpm deploy --node-linker=isolated --filter @hoarder/workers --prod /prod/workers
+RUN pnpm deploy --node-linker=isolated --filter @hoarder/workers --prod /prod/workers
 
 # Build the cli
 RUN (cd apps/cli && pnpm build)
@@ -34,6 +36,9 @@ RUN (cd apps/cli && pnpm build)
 FROM node:22-alpine AS aio_builder
 LABEL org.opencontainers.image.source="https://github.com/hoarder-app/hoarder"
 WORKDIR /app
+
+# https://github.com/hoarder-app/hoarder/issues/967
+RUN npm install -g corepack@0.31.0
 
 ARG SERVER_VERSION=nightly
 ENV SERVER_VERSION=${SERVER_VERSION}
@@ -67,7 +72,7 @@ COPY --chmod=755 ./docker/root/etc/s6-overlay /etc/s6-overlay
 ######################
 # Install runtime deps
 ######################
-RUN apk add --no-cache monolith yt-dlp
+RUN apk add --no-cache monolith yt-dlp graphicsmagick ghostscript
 
 ######################
 # Prepare the web app
@@ -75,6 +80,7 @@ RUN apk add --no-cache monolith yt-dlp
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXTAUTH_URL_INTERNAL=http://localhost:${PORT}
 
 COPY --from=base --chown=node:node /app/apps/web/.next/standalone ./
 COPY --from=base /app/apps/web/public ./apps/web/public
@@ -91,7 +97,7 @@ COPY --from=base --chown=node:node /app/apps/web/.next/static ./apps/web/.next/s
 # Prepare the workers app
 ######################
 COPY --from=base /prod/workers /app/apps/workers
-RUN corepack enable
+RUN corepack enable && corepack pack
 
 ENTRYPOINT ["/init"]
 

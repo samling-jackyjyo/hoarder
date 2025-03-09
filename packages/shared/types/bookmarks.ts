@@ -1,8 +1,9 @@
 import { z } from "zod";
 
+import { zCursorV2 } from "./pagination";
 import { zBookmarkTagSchema } from "./tags";
 
-const MAX_TITLE_LENGTH = 250;
+const MAX_TITLE_LENGTH = 1000;
 
 export const enum BookmarkTypes {
   LINK = "link",
@@ -11,12 +12,17 @@ export const enum BookmarkTypes {
   UNKNOWN = "unknown",
 }
 
+export const zSortOrder = z.enum(["asc", "desc"]);
+export type ZSortOrder = z.infer<typeof zSortOrder>;
+
 export const zAssetTypesSchema = z.enum([
   "screenshot",
+  "assetScreenshot",
   "bannerImage",
   "fullPageArchive",
   "video",
   "bookmarkAsset",
+  "precrawledArchive",
   "unknown",
 ]);
 export type ZAssetType = z.infer<typeof zAssetTypesSchema>;
@@ -28,15 +34,16 @@ export const zAssetSchema = z.object({
 
 export const zBookmarkedLinkSchema = z.object({
   type: z.literal(BookmarkTypes.LINK),
-  url: z.string().url(),
+  url: z.string(),
   title: z.string().nullish(),
   description: z.string().nullish(),
-  imageUrl: z.string().url().nullish(),
+  imageUrl: z.string().nullish(),
   imageAssetId: z.string().nullish(),
   screenshotAssetId: z.string().nullish(),
   fullPageArchiveAssetId: z.string().nullish(),
+  precrawledArchiveAssetId: z.string().nullish(),
   videoAssetId: z.string().nullish(),
-  favicon: z.string().url().nullish(),
+  favicon: z.string().nullish(),
   htmlContent: z.string().nullish(),
   crawledAt: z.date().nullish(),
 });
@@ -55,6 +62,7 @@ export const zBookmarkedAssetSchema = z.object({
   assetId: z.string(),
   fileName: z.string().nullish(),
   sourceUrl: z.string().nullish(),
+  size: z.number().nullish(),
 });
 export type ZBookmarkedAsset = z.infer<typeof zBookmarkedAssetSchema>;
 
@@ -69,7 +77,8 @@ export type ZBookmarkContent = z.infer<typeof zBookmarkContentSchema>;
 export const zBareBookmarkSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
-  title: z.string().max(MAX_TITLE_LENGTH).nullish(),
+  modifiedAt: z.date().nullable(),
+  title: z.string().nullish(),
   archived: z.boolean(),
   favourited: z.boolean(),
   taggingStatus: z.enum(["success", "failure", "pending"]).nullable(),
@@ -114,18 +123,42 @@ const zBookmarkTypeAssetSchema = zBareBookmarkSchema.merge(
 export type ZBookmarkTypeAsset = z.infer<typeof zBookmarkTypeAssetSchema>;
 
 // POST /v1/bookmarks
-export const zNewBookmarkRequestSchema = zBookmarkContentSchema;
+export const zNewBookmarkRequestSchema = z
+  .object({
+    title: z.string().max(MAX_TITLE_LENGTH).nullish(),
+    archived: z.boolean().optional(),
+    favourited: z.boolean().optional(),
+    note: z.string().optional(),
+    summary: z.string().optional(),
+    createdAt: z.coerce.date().optional(),
+  })
+  .and(
+    z.discriminatedUnion("type", [
+      z.object({
+        type: z.literal(BookmarkTypes.LINK),
+        url: z.string().url(),
+        precrawledArchiveId: z.string().optional(),
+      }),
+      z.object({
+        type: z.literal(BookmarkTypes.TEXT),
+        text: z.string(),
+        sourceUrl: z.string().optional(),
+      }),
+      z.object({
+        type: z.literal(BookmarkTypes.ASSET),
+        assetType: z.enum(["image", "pdf"]),
+        assetId: z.string(),
+        fileName: z.string().optional(),
+        sourceUrl: z.string().optional(),
+      }),
+    ]),
+  );
 export type ZNewBookmarkRequest = z.infer<typeof zNewBookmarkRequestSchema>;
 
 // GET /v1/bookmarks
 
 export const DEFAULT_NUM_BOOKMARKS_PER_PAGE = 20;
 export const MAX_NUM_BOOKMARKS_PER_PAGE = 100;
-
-export const zCursorV2 = z.object({
-  createdAt: z.date(),
-  id: z.string(),
-});
 
 export const zGetBookmarksRequestSchema = z.object({
   ids: z.array(z.string()).optional(),
@@ -140,6 +173,7 @@ export const zGetBookmarksRequestSchema = z.object({
   // The value is currently not being used, but keeping it so that client can still set it to true for older
   // servers.
   useCursorV2: z.boolean().optional(),
+  sortOrder: zSortOrder.optional().default("desc"),
 });
 export type ZGetBookmarksRequest = z.infer<typeof zGetBookmarksRequestSchema>;
 
@@ -157,7 +191,7 @@ export const zUpdateBookmarksRequestSchema = z.object({
   summary: z.string().nullish(),
   note: z.string().optional(),
   title: z.string().max(MAX_TITLE_LENGTH).nullish(),
-  createdAt: z.date().optional(),
+  createdAt: z.coerce.date().optional(),
 });
 export type ZUpdateBookmarksRequest = z.infer<
   typeof zUpdateBookmarksRequestSchema
@@ -174,3 +208,16 @@ export const zManipulatedTagSchema = z
     message: "You must provide either a tagId or a tagName",
     path: ["tagId", "tagName"],
   });
+
+export const zSearchBookmarksCursor = z.discriminatedUnion("ver", [
+  z.object({
+    ver: z.literal(1),
+    offset: z.number(),
+  }),
+]);
+export const zSearchBookmarksRequestSchema = z.object({
+  text: z.string(),
+  limit: z.number().max(MAX_NUM_BOOKMARKS_PER_PAGE).optional(),
+  cursor: zSearchBookmarksCursor.nullish(),
+  sortOrder: zSortOrder.optional().default("desc"),
+});

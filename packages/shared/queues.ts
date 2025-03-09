@@ -98,6 +98,13 @@ export async function triggerSearchDeletion(bookmarkId: string) {
   });
 }
 
+export async function triggerReprocessingFixMode(bookmarkId: string) {
+  await AssetPreprocessingQueue.enqueue({
+    bookmarkId,
+    fixMode: true,
+  });
+}
+
 export const zvideoRequestSchema = z.object({
   bookmarkId: z.string(),
   url: z.string(),
@@ -139,3 +146,50 @@ export const FeedQueue = new SqliteQueue<ZFeedRequestSchema>(
     keepFailedJobs: false,
   },
 );
+
+// Preprocess Assets
+export const zAssetPreprocessingRequestSchema = z.object({
+  bookmarkId: z.string(),
+  fixMode: z.boolean().optional().default(false),
+});
+export type AssetPreprocessingRequest = z.infer<
+  typeof zAssetPreprocessingRequestSchema
+>;
+export const AssetPreprocessingQueue =
+  new SqliteQueue<AssetPreprocessingRequest>(
+    "asset_preprocessing_queue",
+    queueDB,
+    {
+      defaultJobArgs: {
+        numRetries: 2,
+      },
+      keepFailedJobs: false,
+    },
+  );
+
+// Webhook worker
+export const zWebhookRequestSchema = z.object({
+  bookmarkId: z.string(),
+  operation: z.enum(["crawled", "created", "edited", "ai tagged"]),
+});
+export type ZWebhookRequest = z.infer<typeof zWebhookRequestSchema>;
+export const WebhookQueue = new SqliteQueue<ZWebhookRequest>(
+  "webhook_queue",
+  queueDB,
+  {
+    defaultJobArgs: {
+      numRetries: 3,
+    },
+    keepFailedJobs: false,
+  },
+);
+
+export async function triggerWebhook(
+  bookmarkId: string,
+  operation: ZWebhookRequest["operation"],
+) {
+  await WebhookQueue.enqueue({
+    bookmarkId,
+    operation,
+  });
+}

@@ -22,9 +22,12 @@ const allEnv = z.object({
   OLLAMA_BASE_URL: z.string().url().optional(),
   OLLAMA_KEEP_ALIVE: z.string().optional(),
   INFERENCE_JOB_TIMEOUT_SEC: z.coerce.number().default(30),
+  INFERENCE_FETCH_TIMEOUT_SEC: z.coerce.number().default(300),
   INFERENCE_TEXT_MODEL: z.string().default("gpt-4o-mini"),
   INFERENCE_IMAGE_MODEL: z.string().default("gpt-4o-mini"),
+  EMBEDDING_TEXT_MODEL: z.string().default("text-embedding-3-small"),
   INFERENCE_CONTEXT_LENGTH: z.coerce.number().default(2048),
+  INFERENCE_SUPPORTS_STRUCTURED_OUTPUT: stringBool("true"),
   OCR_CACHE_DIR: z.string().optional(),
   OCR_LANGS: z
     .string()
@@ -32,8 +35,8 @@ const allEnv = z.object({
     .transform((val) => val.split(",")),
   OCR_CONFIDENCE_THRESHOLD: z.coerce.number().default(50),
   CRAWLER_HEADLESS_BROWSER: stringBool("true"),
-  BROWSER_WEB_URL: z.string().url().optional(),
-  BROWSER_WEBSOCKET_URL: z.string().url().optional(),
+  BROWSER_WEB_URL: z.string().optional(),
+  BROWSER_WEBSOCKET_URL: z.string().optional(),
   BROWSER_CONNECT_ONDEMAND: stringBool("false"),
   CRAWLER_JOB_TIMEOUT_SEC: z.coerce.number().default(60),
   CRAWLER_NAVIGATE_TIMEOUT_SEC: z.coerce.number().default(30),
@@ -45,6 +48,7 @@ const allEnv = z.object({
   CRAWLER_VIDEO_DOWNLOAD: stringBool("false"),
   CRAWLER_VIDEO_DOWNLOAD_MAX_SIZE: z.coerce.number().default(50),
   CRAWLER_VIDEO_DOWNLOAD_TIMEOUT_SEC: z.coerce.number().default(10 * 60),
+  CRAWLER_ENABLE_ADBLOCKER: stringBool("true"),
   MEILI_ADDR: z.string().optional(),
   MEILI_MASTER_KEY: z.string().default(""),
   LOG_LEVEL: z.string().default("debug"),
@@ -52,8 +56,10 @@ const allEnv = z.object({
   DEMO_MODE_EMAIL: z.string().optional(),
   DEMO_MODE_PASSWORD: z.string().optional(),
   DATA_DIR: z.string().default(""),
-  MAX_ASSET_SIZE_MB: z.coerce.number().default(4),
+  MAX_ASSET_SIZE_MB: z.coerce.number().default(50),
   INFERENCE_LANG: z.string().default("english"),
+  WEBHOOK_TIMEOUT_SEC: z.coerce.number().default(5),
+  WEBHOOK_RETRY_TIMES: z.coerce.number().int().min(0).default(3),
   // Build only flag
   SERVER_VERSION: z.string().optional(),
   DISABLE_NEW_RELEASE_CHECK: stringBool("false"),
@@ -80,6 +86,7 @@ const serverConfigSchema = allEnv.transform((val) => {
     },
     inference: {
       jobTimeoutSec: val.INFERENCE_JOB_TIMEOUT_SEC,
+      fetchTimeoutSec: val.INFERENCE_FETCH_TIMEOUT_SEC,
       openAIApiKey: val.OPENAI_API_KEY,
       openAIBaseUrl: val.OPENAI_BASE_URL,
       ollamaBaseUrl: val.OLLAMA_BASE_URL,
@@ -88,6 +95,10 @@ const serverConfigSchema = allEnv.transform((val) => {
       imageModel: val.INFERENCE_IMAGE_MODEL,
       inferredTagLang: val.INFERENCE_LANG,
       contextLength: val.INFERENCE_CONTEXT_LENGTH,
+      supportsStructuredOutput: val.INFERENCE_SUPPORTS_STRUCTURED_OUTPUT,
+    },
+    embedding: {
+      textModel: val.EMBEDDING_TEXT_MODEL,
     },
     crawler: {
       numWorkers: val.CRAWLER_NUM_WORKERS,
@@ -104,6 +115,7 @@ const serverConfigSchema = allEnv.transform((val) => {
       downloadVideo: val.CRAWLER_VIDEO_DOWNLOAD,
       maxVideoDownloadSize: val.CRAWLER_VIDEO_DOWNLOAD_MAX_SIZE,
       downloadVideoTimeout: val.CRAWLER_VIDEO_DOWNLOAD_TIMEOUT_SEC,
+      enableAdblocker: val.CRAWLER_ENABLE_ADBLOCKER,
     },
     ocr: {
       langs: val.OCR_LANGS,
@@ -128,6 +140,10 @@ const serverConfigSchema = allEnv.transform((val) => {
     serverVersion: val.SERVER_VERSION,
     disableNewReleaseCheck: val.DISABLE_NEW_RELEASE_CHECK,
     usingLegacySeparateContainers: val.USING_LEGACY_SEPARATE_CONTAINERS,
+    webhook: {
+      timeoutSec: val.WEBHOOK_TIMEOUT_SEC,
+      retryTimes: val.WEBHOOK_RETRY_TIMES,
+    },
   };
 });
 

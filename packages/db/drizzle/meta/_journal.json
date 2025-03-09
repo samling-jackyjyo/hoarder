@@ -239,6 +239,62 @@
       "when": 1731106561236,
       "tag": "0033_nappy_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "6",
+      "when": 1732990622928,
+      "tag": "0034_wet_the_stranger",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "6",
+      "when": 1735291137509,
+      "tag": "0035_gorgeous_may_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "6",
+      "when": 1735308236125,
+      "tag": "0036_luxuriant_white_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "6",
+      "when": 1735750275339,
+      "tag": "0037_daily_smiling_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "6",
+      "when": 1736695194056,
+      "tag": "0038_calm_clint_barton",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "6",
+      "when": 1737293459640,
+      "tag": "0039_purple_albert_cleary",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "6",
+      "when": 1737310389771,
+      "tag": "0040_long_mindworm",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "6",
+      "when": 1738424745186,
+      "tag": "0041_fat_bloodstrike",
+      "breakpoints": true
     }
   ]
 }

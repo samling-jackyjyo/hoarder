@@ -7,9 +7,11 @@ import { buttonVariants } from "@/components/ui/button";
 import FilePickerButton from "@/components/ui/file-picker-button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   ParsedBookmark,
   parseHoarderBookmarkFile,
+  parseLinkwardenBookmarkFile,
   parseNetscapeBookmarkFile,
   parseOmnivoreBookmarkFile,
   parsePocketBookmarkFile,
@@ -21,7 +23,6 @@ import { Download, Upload } from "lucide-react";
 
 import {
   useCreateBookmarkWithPostHook,
-  useUpdateBookmark,
   useUpdateBookmarkTags,
 } from "@hoarder/shared-react/hooks/bookmarks";
 import {
@@ -30,22 +31,61 @@ import {
 } from "@hoarder/shared-react/hooks/lists";
 import { BookmarkTypes } from "@hoarder/shared/types/bookmarks";
 
-export function ExportButton() {
+import { Card, CardContent } from "../ui/card";
+
+function ImportCard({
+  text,
+  description,
+  children,
+}: {
+  text: string;
+  description: string;
+  children: React.ReactNode;
+}) {
   return (
-    <Link
-      href="/api/bookmarks/export"
-      className={cn(
-        buttonVariants({ variant: "default" }),
-        "flex items-center gap-2",
-      )}
-    >
-      <Download />
-      <p>Export Links and Notes</p>
-    </Link>
+    <Card className="transition-all hover:shadow-md">
+      <CardContent className="flex items-center gap-3 p-4">
+        <div className="rounded-full bg-primary/10 p-2">
+          <Upload className="h-5 w-5 text-primary" />
+        </div>
+        <div className="flex-1">
+          <h3 className="font-medium">{text}</h3>
+          <p>{description}</p>
+        </div>
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ExportButton() {
+  const { t } = useTranslation();
+  return (
+    <Card className="transition-all hover:shadow-md">
+      <CardContent className="flex items-center gap-3 p-4">
+        <div className="rounded-full bg-primary/10 p-2">
+          <Download className="h-5 w-5 text-primary" />
+        </div>
+        <div className="flex-1">
+          <h3 className="font-medium">Export File</h3>
+          <p>{t("settings.import.export_links_and_notes")}</p>
+        </div>
+        <Link
+          href="/api/bookmarks/export"
+          className={cn(
+            buttonVariants({ variant: "default" }),
+            "flex items-center gap-2",
+          )}
+        >
+          <p>Export</p>
+        </Link>
+      </CardContent>
+    </Card>
   );
 }
 
 export function ImportExportRow() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [importProgress, setImportProgress] = useState<{
@@ -54,7 +94,6 @@ export function ImportExportRow() {
   } | null>(null);
 
   const { mutateAsync: createBookmark } = useCreateBookmarkWithPostHook();
-  const { mutateAsync: updateBookmark } = useUpdateBookmark();
   const { mutateAsync: createList } = useCreateBookmarkList();
   const { mutateAsync: addToList } = useAddBookmarkToList();
   const { mutateAsync: updateTags } = useUpdateBookmarkTags();
@@ -68,8 +107,13 @@ export function ImportExportRow() {
       if (bookmark.content === undefined) {
         throw new Error("Content is undefined");
       }
-      const created = await createBookmark(
-        bookmark.content.type === BookmarkTypes.LINK
+      const created = await createBookmark({
+        title: bookmark.title,
+        createdAt: bookmark.addDate
+          ? new Date(bookmark.addDate * 1000)
+          : undefined,
+        note: bookmark.notes,
+        ...(bookmark.content.type === BookmarkTypes.LINK
           ? {
               type: BookmarkTypes.LINK,
               url: bookmark.content.url,
@@ -77,24 +121,10 @@ export function ImportExportRow() {
           : {
               type: BookmarkTypes.TEXT,
               text: bookmark.content.text,
-            },
-      );
+            }),
+      });
 
       await Promise.all([
-        // Update title and createdAt if they're set
-        bookmark.title.length > 0 || bookmark.addDate
-          ? updateBookmark({
-              bookmarkId: created.id,
-              title: bookmark.title,
-              createdAt: bookmark.addDate
-                ? new Date(bookmark.addDate * 1000)
-                : undefined,
-              note: bookmark.notes,
-            }).catch(() => {
-              /* empty */
-            })
-          : undefined,
-
         // Add to import list
         addToList({
           bookmarkId: created.id,
@@ -129,7 +159,7 @@ export function ImportExportRow() {
       source,
     }: {
       file: File;
-      source: "html" | "pocket" | "omnivore" | "hoarder";
+      source: "html" | "pocket" | "omnivore" | "hoarder" | "linkwarden";
     }) => {
       if (source === "html") {
         return await parseNetscapeBookmarkFile(file);
@@ -139,13 +169,15 @@ export function ImportExportRow() {
         return await parseHoarderBookmarkFile(file);
       } else if (source === "omnivore") {
         return await parseOmnivoreBookmarkFile(file);
+      } else if (source === "linkwarden") {
+        return await parseLinkwardenBookmarkFile(file);
       } else {
         throw new Error("Unknown source");
       }
     },
     onSuccess: async (resp) => {
       const importList = await createList({
-        name: `Imported Bookmarks`,
+        name: t("settings.import.imported_bookmarks"),
         icon: "⬆️",
       });
       setImportProgress({ done: 0, total: resp.length });
@@ -200,56 +232,98 @@ export function ImportExportRow() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-row flex-wrap gap-2">
-        <FilePickerButton
-          loading={false}
-          accept=".html"
-          multiple={false}
-          className="flex items-center gap-2"
-          onFileSelect={(file) =>
-            runUploadBookmarkFile({ file, source: "html" })
-          }
+      <div className="grid gap-4 md:grid-cols-2">
+        <ImportCard
+          text="HTML File"
+          description={t("settings.import.import_bookmarks_from_html_file")}
         >
-          <Upload />
-          <p>Import Bookmarks from HTML file</p>
-        </FilePickerButton>
-
-        <FilePickerButton
-          loading={false}
-          accept=".csv"
-          multiple={false}
-          className="flex items-center gap-2"
-          onFileSelect={(file) =>
-            runUploadBookmarkFile({ file, source: "pocket" })
-          }
+          <FilePickerButton
+            size={"sm"}
+            loading={false}
+            accept=".html"
+            multiple={false}
+            className="flex items-center gap-2"
+            onFileSelect={(file) =>
+              runUploadBookmarkFile({ file, source: "html" })
+            }
+          >
+            <p>Import</p>
+          </FilePickerButton>
+        </ImportCard>
+        <ImportCard
+          text="Pocket"
+          description={t("settings.import.import_bookmarks_from_pocket_export")}
         >
-          <Upload />
-          <p>Import Bookmarks from Pocket export</p>
-        </FilePickerButton>
-        <FilePickerButton
-          loading={false}
-          accept=".json"
-          multiple={false}
-          className="flex items-center gap-2"
-          onFileSelect={(file) =>
-            runUploadBookmarkFile({ file, source: "omnivore" })
-          }
+          <FilePickerButton
+            size={"sm"}
+            loading={false}
+            accept=".csv"
+            multiple={false}
+            className="flex items-center gap-2"
+            onFileSelect={(file) =>
+              runUploadBookmarkFile({ file, source: "pocket" })
+            }
+          >
+            <p>Import</p>
+          </FilePickerButton>
+        </ImportCard>
+        <ImportCard
+          text="Omnivore"
+          description={t(
+            "settings.import.import_bookmarks_from_omnivore_export",
+          )}
         >
-          <Upload />
-          <p>Import Bookmarks from Omnivore export</p>
-        </FilePickerButton>
-        <FilePickerButton
-          loading={false}
-          accept=".json"
-          multiple={false}
-          className="flex items-center gap-2"
-          onFileSelect={(file) =>
-            runUploadBookmarkFile({ file, source: "hoarder" })
-          }
+          <FilePickerButton
+            size={"sm"}
+            loading={false}
+            accept=".json"
+            multiple={false}
+            className="flex items-center gap-2"
+            onFileSelect={(file) =>
+              runUploadBookmarkFile({ file, source: "omnivore" })
+            }
+          >
+            <p>Import</p>
+          </FilePickerButton>
+        </ImportCard>
+        <ImportCard
+          text="Linkwarden"
+          description={t(
+            "settings.import.import_bookmarks_from_linkwarden_export",
+          )}
         >
-          <Upload />
-          <p>Import Bookmarks from Hoarder export</p>
-        </FilePickerButton>
+          <FilePickerButton
+            size={"sm"}
+            loading={false}
+            accept=".json"
+            multiple={false}
+            className="flex items-center gap-2"
+            onFileSelect={(file) =>
+              runUploadBookmarkFile({ file, source: "linkwarden" })
+            }
+          >
+            <p>Import</p>
+          </FilePickerButton>
+        </ImportCard>
+        <ImportCard
+          text="Hoarder"
+          description={t(
+            "settings.import.import_bookmarks_from_hoarder_export",
+          )}
+        >
+          <FilePickerButton
+            size={"sm"}
+            loading={false}
+            accept=".json"
+            multiple={false}
+            className="flex items-center gap-2"
+            onFileSelect={(file) =>
+              runUploadBookmarkFile({ file, source: "hoarder" })
+            }
+          >
+            <p>Import</p>
+          </FilePickerButton>
+        </ImportCard>
         <ExportButton />
       </div>
       {importProgress && (
@@ -269,9 +343,12 @@ export function ImportExportRow() {
 }
 
 export default function ImportExport() {
+  const { t } = useTranslation();
   return (
     <div className="flex w-full flex-col gap-2">
-      <p className="mb-4 text-lg font-medium">Import / Export Bookmarks</p>
+      <p className="mb-4 text-lg font-medium">
+        {t("settings.import.import_export_bookmarks")}
+      </p>
       <ImportExportRow />
     </div>
   );

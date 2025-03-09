@@ -4,6 +4,7 @@ import { Glob } from "glob";
 import { z } from "zod";
 
 import serverConfig from "./config";
+import logger from "./logger";
 
 const ROOT_PATH = path.join(serverConfig.dataDir, "assets");
 
@@ -24,6 +25,13 @@ export const IMAGE_ASSET_TYPES: Set<string> = new Set<string>([
 
 // The assets that we allow the users to upload
 export const SUPPORTED_UPLOAD_ASSET_TYPES: Set<string> = new Set<string>([
+  ...IMAGE_ASSET_TYPES,
+  ASSET_TYPES.TEXT_HTML,
+  ASSET_TYPES.APPLICATION_PDF,
+]);
+
+// The assets that we allow as a bookmark of type asset
+export const SUPPORTED_BOOKMARK_ASSET_TYPES: Set<string> = new Set<string>([
   ...IMAGE_ASSET_TYPES,
   ASSET_TYPES.APPLICATION_PDF,
 ]);
@@ -66,7 +74,10 @@ export async function saveAsset({
   await fs.promises.mkdir(assetDir, { recursive: true });
 
   await Promise.all([
-    fs.promises.writeFile(path.join(assetDir, "asset.bin"), asset),
+    fs.promises.writeFile(
+      path.join(assetDir, "asset.bin"),
+      Uint8Array.from(asset),
+    ),
     fs.promises.writeFile(
       path.join(assetDir, "metadata.json"),
       JSON.stringify(metadata),
@@ -121,6 +132,25 @@ export async function readAsset({
 
   const metadata = zAssetMetadataSchema.parse(JSON.parse(metadataStr));
   return { asset, metadata };
+}
+
+export function createAssetReadStream({
+  userId,
+  assetId,
+  start,
+  end,
+}: {
+  userId: string;
+  assetId: string;
+  start?: number;
+  end?: number;
+}) {
+  const assetDir = getAssetDir(userId, assetId);
+
+  return fs.createReadStream(path.join(assetDir, "asset.bin"), {
+    start,
+    end,
+  });
 }
 
 export async function readAssetMetadata({
@@ -211,4 +241,36 @@ export async function* getAllAssets() {
       size,
     };
   }
+}
+
+export async function storeScreenshot(
+  screenshot: Buffer | undefined,
+  userId: string,
+  jobId: string,
+) {
+  if (!serverConfig.crawler.storeScreenshot) {
+    logger.info(
+      `[Crawler][${jobId}] Skipping storing the screenshot as per the config.`,
+    );
+    return null;
+  }
+  if (!screenshot) {
+    logger.info(
+      `[Crawler][${jobId}] Skipping storing the screenshot as it's empty.`,
+    );
+    return null;
+  }
+  const assetId = newAssetId();
+  const contentType = "image/png";
+  const fileName = "screenshot.png";
+  await saveAsset({
+    userId,
+    assetId,
+    metadata: { contentType, fileName },
+    asset: screenshot,
+  });
+  logger.info(
+    `[Crawler][${jobId}] Stored the screenshot as assetId: ${assetId}`,
+  );
+  return { assetId, contentType, fileName, size: screenshot.byteLength };
 }

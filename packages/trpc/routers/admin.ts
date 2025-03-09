@@ -3,12 +3,18 @@ import { count, eq, sum } from "drizzle-orm";
 import { z } from "zod";
 
 import { assets, bookmarkLinks, bookmarks, users } from "@hoarder/db/schema";
+import serverConfig from "@hoarder/shared/config";
 import {
+  AssetPreprocessingQueue,
+  FeedQueue,
   LinkCrawlerQueue,
   OpenAIQueue,
   SearchIndexingQueue,
   TidyAssetsQueue,
+  triggerReprocessingFixMode,
   triggerSearchReindex,
+  VideoWorkerQueue,
+  WebhookQueue,
 } from "@hoarder/shared/queues";
 import {
   changeRoleSchema,
@@ -26,6 +32,23 @@ export const adminAppRouter = router({
       z.object({
         numUsers: z.number(),
         numBookmarks: z.number(),
+      }),
+    )
+    .query(async ({ ctx }) => {
+      const [[{ value: numUsers }], [{ value: numBookmarks }]] =
+        await Promise.all([
+          ctx.db.select({ value: count() }).from(users),
+          ctx.db.select({ value: count() }).from(bookmarks),
+        ]);
+
+      return {
+        numUsers,
+        numBookmarks,
+      };
+    }),
+  backgroundJobsStats: adminProcedure
+    .output(
+      z.object({
         crawlStats: z.object({
           queued: z.number(),
           pending: z.number(),
@@ -42,13 +65,22 @@ export const adminAppRouter = router({
         tidyAssetsStats: z.object({
           queued: z.number(),
         }),
+        videoStats: z.object({
+          queued: z.number(),
+        }),
+        webhookStats: z.object({
+          queued: z.number(),
+        }),
+        assetPreprocessingStats: z.object({
+          queued: z.number(),
+        }),
+        feedStats: z.object({
+          queued: z.number(),
+        }),
       }),
     )
     .query(async ({ ctx }) => {
       const [
-        [{ value: numUsers }],
-        [{ value: numBookmarks }],
-
         // Crawls
         queuedCrawls,
         [{ value: pendingCrawls }],
@@ -64,10 +96,19 @@ export const adminAppRouter = router({
 
         // Tidy Assets
         queuedTidyAssets,
-      ] = await Promise.all([
-        ctx.db.select({ value: count() }).from(users),
-        ctx.db.select({ value: count() }).from(bookmarks),
 
+        // Video
+        queuedVideo,
+
+        // Webhook
+        queuedWebhook,
+
+        // Asset Preprocessing
+        queuedAssetPreprocessing,
+
+        // Feed
+        queuedFeed,
+      ] = await Promise.all([
         // Crawls
         LinkCrawlerQueue.stats(),
         ctx.db
@@ -95,11 +136,21 @@ export const adminAppRouter = router({
 
         // Tidy Assets
         TidyAssetsQueue.stats(),
+
+        // Video
+        VideoWorkerQueue.stats(),
+
+        // Webhook
+        WebhookQueue.stats(),
+
+        // Asset Preprocessing
+        AssetPreprocessingQueue.stats(),
+
+        // Feed
+        FeedQueue.stats(),
       ]);
 
       return {
-        numUsers,
-        numBookmarks,
         crawlStats: {
           queued: queuedCrawls.pending + queuedCrawls.pending_retry,
           pending: pendingCrawls,
@@ -115,6 +166,20 @@ export const adminAppRouter = router({
         },
         tidyAssetsStats: {
           queued: queuedTidyAssets.pending + queuedTidyAssets.pending_retry,
+        },
+        videoStats: {
+          queued: queuedVideo.pending + queuedVideo.pending_retry,
+        },
+        webhookStats: {
+          queued: queuedWebhook.pending + queuedWebhook.pending_retry,
+        },
+        assetPreprocessingStats: {
+          queued:
+            queuedAssetPreprocessing.pending +
+            queuedAssetPreprocessing.pending_retry,
+        },
+        feedStats: {
+          queued: queuedFeed.pending + queuedFeed.pending_retry,
         },
       };
     }),
@@ -152,6 +217,15 @@ export const adminAppRouter = router({
     });
 
     await Promise.all(bookmarkIds.map((b) => triggerSearchReindex(b.id)));
+  }),
+  reprocessAssetsFixMode: adminProcedure.mutation(async ({ ctx }) => {
+    const bookmarkIds = await ctx.db.query.bookmarkAssets.findMany({
+      columns: {
+        id: true,
+      },
+    });
+
+    await Promise.all(bookmarkIds.map((b) => triggerReprocessingFixMode(b.id)));
   }),
   reRunInferenceOnAllBookmarks: adminProcedure
     .input(
@@ -276,5 +350,16 @@ export const adminAppRouter = router({
           message: "User not found",
         });
       }
+    }),
+  getAdminNoticies: adminProcedure
+    .output(
+      z.object({
+        legacyContainersNotice: z.boolean(),
+      }),
+    )
+    .query(() => {
+      return {
+        legacyContainersNotice: serverConfig.usingLegacySeparateContainers,
+      };
     }),
 });

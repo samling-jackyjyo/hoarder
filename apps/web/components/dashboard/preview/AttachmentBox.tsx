@@ -9,31 +9,18 @@ import {
 } from "@/components/ui/collapsible";
 import FilePickerButton from "@/components/ui/file-picker-button";
 import { toast } from "@/components/ui/use-toast";
+import { ASSET_TYPE_TO_ICON } from "@/lib/attachments";
 import useUpload from "@/lib/hooks/upload-file";
-import {
-  Archive,
-  Camera,
-  ChevronsDownUp,
-  Download,
-  Image,
-  Paperclip,
-  Pencil,
-  Plus,
-  Trash2,
-  Video,
-} from "lucide-react";
+import { useTranslation } from "@/lib/i18n/client";
+import { ChevronsDownUp, Download, Pencil, Plus, Trash2 } from "lucide-react";
 
 import {
   useAttachBookmarkAsset,
   useDetachBookmarkAsset,
   useReplaceBookmarkAsset,
-} from "@hoarder/shared-react/hooks/bookmarks";
+} from "@hoarder/shared-react/hooks/assets";
 import { getAssetUrl } from "@hoarder/shared-react/utils/assetUtils";
-import {
-  BookmarkTypes,
-  ZAssetType,
-  ZBookmark,
-} from "@hoarder/shared/types/bookmarks";
+import { BookmarkTypes, ZBookmark } from "@hoarder/shared/types/bookmarks";
 import {
   humanFriendlyNameForAssertType,
   isAllowedToAttachAsset,
@@ -41,15 +28,7 @@ import {
 } from "@hoarder/trpc/lib/attachments";
 
 export default function AttachmentBox({ bookmark }: { bookmark: ZBookmark }) {
-  const typeToIcon: Record<ZAssetType, React.ReactNode> = {
-    screenshot: <Camera className="size-4" />,
-    fullPageArchive: <Archive className="size-4" />,
-    bannerImage: <Image className="size-4" />,
-    video: <Video className="size-4" />,
-    bookmarkAsset: <Paperclip className="size-4" />,
-    unknown: <Paperclip className="size-4" />,
-  };
-
+  const { t } = useTranslation();
   const { mutate: attachAsset, isPending: isAttaching } =
     useAttachBookmarkAsset({
       onSuccess: () => {
@@ -109,7 +88,7 @@ export default function AttachmentBox({ bookmark }: { bookmark: ZBookmark }) {
   return (
     <Collapsible>
       <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 text-sm text-gray-400">
-        Attachments
+        {t("common.attachments")}
         <ChevronsDownUp className="size-4" />
       </CollapsibleTrigger>
       <CollapsibleContent className="flex flex-col gap-1 py-2 text-sm">
@@ -120,7 +99,7 @@ export default function AttachmentBox({ bookmark }: { bookmark: ZBookmark }) {
               href={getAssetUrl(asset.id)}
               className="flex items-center gap-1"
             >
-              {typeToIcon[asset.assetType]}
+              {ASSET_TYPE_TO_ICON[asset.assetType]}
               <p>{humanFriendlyNameForAssertType(asset.assetType)}</p>
             </Link>
             <div className="flex gap-2">

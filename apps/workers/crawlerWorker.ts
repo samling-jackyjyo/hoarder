@@ -1,7 +1,9 @@
-import assert from "assert";
 import * as dns from "dns";
+import { promises as fs } from "fs";
 import * as path from "node:path";
+import * as os from "os";
 import type { Browser } from "puppeteer";
+import { PuppeteerBlocker } from "@ghostery/adblocker-puppeteer";
 import { Readability } from "@mozilla/readability";
 import { Mutex } from "async-mutex";
 import DOMPurify from "dompurify";
@@ -19,8 +21,8 @@ import metascraperReadability from "metascraper-readability";
 import metascraperTitle from "metascraper-title";
 import metascraperTwitter from "metascraper-twitter";
 import metascraperUrl from "metascraper-url";
+import fetch from "node-fetch";
 import puppeteer from "puppeteer-extra";
-import AdblockerPlugin from "puppeteer-extra-plugin-adblocker";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { withTimeout } from "utils";
 import { getBookmarkDetails, updateAsset } from "workerUtils";
@@ -39,6 +41,7 @@ import {
   getAssetSize,
   IMAGE_ASSET_TYPES,
   newAssetId,
+  readAsset,
   saveAsset,
   saveAssetFromFile,
   silentDeleteAsset,
@@ -47,10 +50,12 @@ import {
 import serverConfig from "@hoarder/shared/config";
 import logger from "@hoarder/shared/logger";
 import {
+  AssetPreprocessingQueue,
   LinkCrawlerQueue,
   OpenAIQueue,
   triggerSearchReindex,
   triggerVideoWorker,
+  triggerWebhook,
   zCrawlLinkRequestSchema,
 } from "@hoarder/shared/queues";
 import { BookmarkTypes } from "@hoarder/shared/types/bookmarks";
@@ -67,6 +72,7 @@ const metascraperParser = metascraper([
 ]);
 
 let globalBrowser: Browser | undefined;
+let globalBlocker: PuppeteerBlocker | undefined;
 // Guards the interactions with the browser instance.
 // This is needed given that most of the browser APIs are async.
 const browserMutex = new Mutex();
@@ -100,11 +106,8 @@ async function startBrowserInstance() {
       defaultViewport,
     });
   } else {
-    logger.info(`Launching a new browser instance`);
-    return puppeteer.launch({
-      headless: serverConfig.crawler.headlessBrowser,
-      defaultViewport,
-    });
+    logger.info(`Running in browserless mode`);
+    return undefined;
   }
 }
 
@@ -115,7 +118,7 @@ async function launchBrowser() {
       globalBrowser = await startBrowserInstance();
     } catch (e) {
       logger.error(
-        "[Crawler] Failed to connect to the browser instance, will retry in 5 secs",
+        `[Crawler] Failed to connect to the browser instance, will retry in 5 secs: ${(e as Error).stack}`,
       );
       if (isShuttingDown) {
         logger.info("[Crawler] We're shutting down so won't retry.");
@@ -126,7 +129,7 @@ async function launchBrowser() {
       }, 5000);
       return;
     }
-    globalBrowser.on("disconnected", () => {
+    globalBrowser?.on("disconnected", () => {
       if (isShuttingDown) {
         logger.info(
           "[Crawler] The puppeteer browser got disconnected. But we're shutting down so won't restart it.",
@@ -144,11 +147,20 @@ async function launchBrowser() {
 export class CrawlerWorker {
   static async build() {
     puppeteer.use(StealthPlugin());
-    puppeteer.use(
-      AdblockerPlugin({
-        blockTrackersAndAnnoyances: true,
-      }),
-    );
+    if (serverConfig.crawler.enableAdblocker) {
+      try {
+        logger.info("[crawler] Loading adblocker ...");
+        globalBlocker = await PuppeteerBlocker.fromPrebuiltFull(fetch, {
+          path: path.join(os.tmpdir(), "hoarder_adblocker.bin"),
+          read: fs.readFile,
+          write: fs.writeFile,
+        });
+      } catch (e) {
+        logger.error(
+          `[crawler] Failed to load adblocker. Will not be blocking ads: ${e}`,
+        );
+      }
+    }
     if (!serverConfig.crawler.browserConnectOnDemand) {
       await launchBrowser();
     } else {
@@ -225,24 +237,59 @@ function validateUrl(url: string) {
   }
 }
 
-async function crawlPage(jobId: string, url: string) {
-  let browser: Browser;
+async function browserlessCrawlPage(
+  jobId: string,
+  url: string,
+  abortSignal: AbortSignal,
+) {
+  logger.info(
+    `[Crawler][${jobId}] Running in browserless mode. Will do a plain http request to "${url}". Screenshots will be disabled.`,
+  );
+  const response = await fetch(url, {
+    signal: AbortSignal.any([AbortSignal.timeout(5000), abortSignal]),
+  });
+  logger.info(
+    `[Crawler][${jobId}] Successfully fetched the content of "${url}". Status: ${response.status}, Size: ${response.size}`,
+  );
+  return {
+    htmlContent: await response.text(),
+    statusCode: response.status,
+    screenshot: undefined,
+    url: response.url,
+  };
+}
+
+async function crawlPage(
+  jobId: string,
+  url: string,
+  abortSignal: AbortSignal,
+): Promise<{
+  htmlContent: string;
+  screenshot: Buffer | undefined;
+  statusCode: number;
+  url: string;
+}> {
+  let browser: Browser | undefined;
   if (serverConfig.crawler.browserConnectOnDemand) {
     browser = await startBrowserInstance();
   } else {
-    assert(globalBrowser);
     browser = globalBrowser;
   }
-  assert(browser);
+  if (!browser) {
+    return browserlessCrawlPage(jobId, url, abortSignal);
+  }
   const context = await browser.createBrowserContext();
 
   try {
     const page = await context.newPage();
+    if (globalBlocker) {
+      await globalBlocker.enableBlockingInPage(page);
+    }
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     );
 
-    await page.goto(url, {
+    const response = await page.goto(url, {
       timeout: serverConfig.crawler.navigateTimeoutSec * 1000,
     });
     logger.info(
@@ -261,20 +308,34 @@ async function crawlPage(jobId: string, url: string) {
 
     logger.info(`[Crawler][${jobId}] Finished waiting for the page to load.`);
 
-    const [htmlContent, screenshot] = await Promise.all([
-      page.content(),
-      page.screenshot({
-        // If you change this, you need to change the asset type in the store function.
-        type: "png",
-        encoding: "binary",
-        fullPage: serverConfig.crawler.fullPageScreenshot,
-      }),
-    ]);
-    logger.info(
-      `[Crawler][${jobId}] Finished capturing page content and a screenshot. FullPageScreenshot: ${serverConfig.crawler.fullPageScreenshot}`,
-    );
+    const htmlContent = await page.content();
+    logger.info(`[Crawler][${jobId}] Successfully fetched the page content.`);
+
+    let screenshot: Buffer | undefined = undefined;
+    if (serverConfig.crawler.storeScreenshot) {
+      screenshot = await Promise.race<Buffer | undefined>([
+        page
+          .screenshot({
+            // If you change this, you need to change the asset type in the store function.
+            type: "png",
+            encoding: "binary",
+            fullPage: serverConfig.crawler.fullPageScreenshot,
+          })
+          .catch(() => undefined),
+        new Promise((f) => setTimeout(f, 5000)),
+      ]);
+      if (!screenshot) {
+        logger.warn(`[Crawler][${jobId}] Failed to capture the screenshot.`);
+      } else {
+        logger.info(
+          `[Crawler][${jobId}] Finished capturing page content and a screenshot. FullPageScreenshot: ${serverConfig.crawler.fullPageScreenshot}`,
+        );
+      }
+    }
+
     return {
       htmlContent,
+      statusCode: response?.status() ?? 0,
       screenshot,
       url: page.url(),
     };
@@ -320,13 +381,19 @@ function extractReadableContent(
 }
 
 async function storeScreenshot(
-  screenshot: Buffer,
+  screenshot: Buffer | undefined,
   userId: string,
   jobId: string,
 ) {
   if (!serverConfig.crawler.storeScreenshot) {
     logger.info(
       `[Crawler][${jobId}] Skipping storing the screenshot as per the config.`,
+    );
+    return null;
+  }
+  if (!screenshot) {
+    logger.info(
+      `[Crawler][${jobId}] Skipping storing the screenshot as it's empty.`,
     );
     return null;
   }
@@ -350,10 +417,13 @@ async function downloadAndStoreFile(
   userId: string,
   jobId: string,
   fileType: string,
+  abortSignal: AbortSignal,
 ) {
   try {
     logger.info(`[Crawler][${jobId}] Downloading ${fileType} from "${url}"`);
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      signal: abortSignal,
+    });
     if (!response.ok) {
       throw new Error(`Failed to download ${fileType}: ${response.status}`);
     }
@@ -389,6 +459,7 @@ async function downloadAndStoreImage(
   url: string,
   userId: string,
   jobId: string,
+  abortSignal: AbortSignal,
 ) {
   if (!serverConfig.crawler.downloadBannerImage) {
     logger.info(
@@ -396,7 +467,7 @@ async function downloadAndStoreImage(
     );
     return null;
   }
-  return downloadAndStoreFile(url, userId, jobId, "image");
+  return downloadAndStoreFile(url, userId, jobId, "image", abortSignal);
 }
 
 async function archiveWebpage(
@@ -404,6 +475,7 @@ async function archiveWebpage(
   url: string,
   userId: string,
   jobId: string,
+  abortSignal: AbortSignal,
 ) {
   logger.info(`[Crawler][${jobId}] Will attempt to archive page ...`);
   const assetId = newAssetId();
@@ -411,6 +483,7 @@ async function archiveWebpage(
 
   await execa({
     input: html,
+    cancelSignal: abortSignal,
   })("monolith", ["-", "-Ije", "-t", "5", "-b", url, "-o", assetPath]);
 
   const contentType = "text/html";
@@ -438,6 +511,7 @@ async function archiveWebpage(
 async function getContentType(
   url: string,
   jobId: string,
+  abortSignal: AbortSignal,
 ): Promise<string | null> {
   try {
     logger.info(
@@ -445,7 +519,7 @@ async function getContentType(
     );
     const response = await fetch(url, {
       method: "HEAD",
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.any([AbortSignal.timeout(5000), abortSignal]),
     });
     const contentType = response.headers.get("content-type");
     logger.info(
@@ -474,8 +548,15 @@ async function handleAsAssetBookmark(
   userId: string,
   jobId: string,
   bookmarkId: string,
+  abortSignal: AbortSignal,
 ) {
-  const downloaded = await downloadAndStoreFile(url, userId, jobId, assetType);
+  const downloaded = await downloadAndStoreFile(
+    url,
+    userId,
+    jobId,
+    assetType,
+    abortSignal,
+  );
   if (!downloaded) {
     return;
   }
@@ -509,6 +590,10 @@ async function handleAsAssetBookmark(
       .where(eq(bookmarks.id, bookmarkId));
     await trx.delete(bookmarkLinks).where(eq(bookmarkLinks.id, bookmarkId));
   });
+  await AssetPreprocessingQueue.enqueue({
+    bookmarkId,
+    fixMode: false,
+  });
 }
 
 async function crawlAndParseUrl(
@@ -519,22 +604,52 @@ async function crawlAndParseUrl(
   oldScreenshotAssetId: string | undefined,
   oldImageAssetId: string | undefined,
   oldFullPageArchiveAssetId: string | undefined,
+  precrawledArchiveAssetId: string | undefined,
   archiveFullPage: boolean,
+  abortSignal: AbortSignal,
 ) {
-  const {
-    htmlContent,
-    screenshot,
-    url: browserUrl,
-  } = await crawlPage(jobId, url);
+  let result: {
+    htmlContent: string;
+    screenshot: Buffer | undefined;
+    statusCode: number | null;
+    url: string;
+  };
+
+  if (precrawledArchiveAssetId) {
+    logger.info(
+      `[Crawler][${jobId}] The page has been precrawled. Will use the precrawled archive instead.`,
+    );
+    const asset = await readAsset({
+      userId,
+      assetId: precrawledArchiveAssetId,
+    });
+    result = {
+      htmlContent: asset.asset.toString(),
+      screenshot: undefined,
+      statusCode: 200,
+      url,
+    };
+  } else {
+    result = await crawlPage(jobId, url, abortSignal);
+  }
+  abortSignal.throwIfAborted();
+
+  const { htmlContent, screenshot, statusCode, url: browserUrl } = result;
 
   const [meta, readableContent, screenshotAssetInfo] = await Promise.all([
     extractMetadata(htmlContent, browserUrl, jobId),
     extractReadableContent(htmlContent, browserUrl, jobId),
     storeScreenshot(screenshot, userId, jobId),
   ]);
+  abortSignal.throwIfAborted();
   let imageAssetInfo: DBAssetType | null = null;
   if (meta.image) {
-    const downloaded = await downloadAndStoreImage(meta.image, userId, jobId);
+    const downloaded = await downloadAndStoreImage(
+      meta.image,
+      userId,
+      jobId,
+      abortSignal,
+    );
     if (downloaded) {
       imageAssetInfo = {
         id: downloaded.assetId,
@@ -546,6 +661,7 @@ async function crawlAndParseUrl(
       };
     }
   }
+  abortSignal.throwIfAborted();
 
   // TODO(important): Restrict the size of content to store
   await db.transaction(async (txn) => {
@@ -554,11 +670,13 @@ async function crawlAndParseUrl(
       .set({
         title: meta.title,
         description: meta.description,
-        imageUrl: meta.image,
+        // Don't store data URIs as they're not valid URLs and are usually quite large
+        imageUrl: meta.image?.startsWith("data:") ? null : meta.image,
         favicon: meta.logo,
         content: readableContent?.textContent,
         htmlContent: readableContent?.content,
         crawledAt: new Date(),
+        crawlStatusCode: statusCode,
       })
       .where(eq(bookmarkLinks.id, bookmarkId));
 
@@ -589,12 +707,21 @@ async function crawlAndParseUrl(
   ]);
 
   return async () => {
-    if (serverConfig.crawler.fullPageArchive || archiveFullPage) {
+    if (
+      !precrawledArchiveAssetId &&
+      (serverConfig.crawler.fullPageArchive || archiveFullPage)
+    ) {
       const {
         assetId: fullPageArchiveAssetId,
         size,
         contentType,
-      } = await archiveWebpage(htmlContent, browserUrl, userId, jobId);
+      } = await archiveWebpage(
+        htmlContent,
+        browserUrl,
+        userId,
+        jobId,
+        abortSignal,
+      );
 
       await db.transaction(async (txn) => {
         await updateAsset(
@@ -636,6 +763,7 @@ async function runCrawler(job: DequeuedJob<ZCrawlLinkRequest>) {
     screenshotAssetId: oldScreenshotAssetId,
     imageAssetId: oldImageAssetId,
     fullPageArchiveAssetId: oldFullPageArchiveAssetId,
+    precrawledArchiveAssetId,
   } = await getBookmarkDetails(bookmarkId);
 
   logger.info(
@@ -643,24 +771,35 @@ async function runCrawler(job: DequeuedJob<ZCrawlLinkRequest>) {
   );
   validateUrl(url);
 
-  const contentType = await getContentType(url, jobId);
+  const contentType = await getContentType(url, jobId, job.abortSignal);
 
   // Link bookmarks get transformed into asset bookmarks if they point to a supported asset instead of a webpage
   const isPdf = contentType === ASSET_TYPES.APPLICATION_PDF;
 
-  let archivalLogic: () => Promise<void> = () => {
-    return Promise.resolve();
-  };
   if (isPdf) {
-    await handleAsAssetBookmark(url, "pdf", userId, jobId, bookmarkId);
+    await handleAsAssetBookmark(
+      url,
+      "pdf",
+      userId,
+      jobId,
+      bookmarkId,
+      job.abortSignal,
+    );
   } else if (
     contentType &&
     IMAGE_ASSET_TYPES.has(contentType) &&
     SUPPORTED_UPLOAD_ASSET_TYPES.has(contentType)
   ) {
-    await handleAsAssetBookmark(url, "image", userId, jobId, bookmarkId);
+    await handleAsAssetBookmark(
+      url,
+      "image",
+      userId,
+      jobId,
+      bookmarkId,
+      job.abortSignal,
+    );
   } else {
-    archivalLogic = await crawlAndParseUrl(
+    const archivalLogic = await crawlAndParseUrl(
       url,
       userId,
       jobId,
@@ -668,23 +807,28 @@ async function runCrawler(job: DequeuedJob<ZCrawlLinkRequest>) {
       oldScreenshotAssetId,
       oldImageAssetId,
       oldFullPageArchiveAssetId,
+      precrawledArchiveAssetId,
       archiveFullPage,
+      job.abortSignal,
     );
+
+    // Enqueue openai job (if not set, assume it's true for backward compatibility)
+    if (job.data.runInference !== false) {
+      await OpenAIQueue.enqueue({
+        bookmarkId,
+      });
+    }
+
+    // Update the search index
+    await triggerSearchReindex(bookmarkId);
+
+    // Trigger a potential download of a video from the URL
+    await triggerVideoWorker(bookmarkId, url);
+
+    // Trigger a webhook
+    await triggerWebhook(bookmarkId, "crawled");
+
+    // Do the archival as a separate last step as it has the potential for failure
+    await archivalLogic();
   }
-
-  // Enqueue openai job (if not set, assume it's true for backward compatibility)
-  if (job.data.runInference !== false) {
-    await OpenAIQueue.enqueue({
-      bookmarkId,
-    });
-  }
-
-  // Update the search index
-  await triggerSearchReindex(bookmarkId);
-
-  // Trigger a potential download of a video from the URL
-  await triggerVideoWorker(bookmarkId, url);
-
-  // Do the archival as a separate last step as it has the potential for failure
-  await archivalLogic();
 }

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { useClientConfig } from "@/lib/clientConfig";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   FileDown,
   Link,
@@ -27,20 +28,22 @@ import type {
   ZBookmarkedLink,
 } from "@hoarder/shared/types/bookmarks";
 import {
-  useDeleteBookmark,
   useRecrawlBookmark,
   useUpdateBookmark,
 } from "@hoarder/shared-react/hooks//bookmarks";
 import { useRemoveBookmarkFromList } from "@hoarder/shared-react/hooks//lists";
 import { useBookmarkGridContext } from "@hoarder/shared-react/hooks/bookmark-grid-context";
+import { useBookmarkListContext } from "@hoarder/shared-react/hooks/bookmark-list-context";
 import { BookmarkTypes } from "@hoarder/shared/types/bookmarks";
 
 import { BookmarkedTextEditor } from "./BookmarkedTextEditor";
+import DeleteBookmarkConfirmationDialog from "./DeleteBookmarkConfirmationDialog";
 import { ArchivedActionIcon, FavouritedActionIcon } from "./icons";
 import { useManageListsModal } from "./ManageListsModal";
 import { useTagModel } from "./TagModal";
 
 export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const linkId = bookmark.id;
 
@@ -51,30 +54,24 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
   const { setOpen: setManageListsModalOpen, content: manageListsModal } =
     useManageListsModal(bookmark.id);
 
+  const [deleteBookmarkDialogOpen, setDeleteBookmarkDialogOpen] =
+    useState(false);
   const [isTextEditorOpen, setTextEditorOpen] = useState(false);
 
   const { listId } = useBookmarkGridContext() ?? {};
+  const withinListContext = useBookmarkListContext();
 
   const onError = () => {
     toast({
       variant: "destructive",
-      title: "Something went wrong",
-      description: "There was a problem with your request.",
+      title: t("common.something_went_wrong"),
     });
   };
-  const deleteBookmarkMutator = useDeleteBookmark({
-    onSuccess: () => {
-      toast({
-        description: "The bookmark has been deleted!",
-      });
-    },
-    onError,
-  });
 
   const updateBookmarkMutator = useUpdateBookmark({
     onSuccess: () => {
       toast({
-        description: "The bookmark has been updated!",
+        description: t("toasts.bookmarks.updated"),
       });
     },
     onError,
@@ -83,7 +80,7 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
   const crawlBookmarkMutator = useRecrawlBookmark({
     onSuccess: () => {
       toast({
-        description: "Re-fetch has been enqueued!",
+        description: t("toasts.bookmarks.refetch"),
       });
     },
     onError,
@@ -92,7 +89,7 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
   const fullPageArchiveBookmarkMutator = useRecrawlBookmark({
     onSuccess: () => {
       toast({
-        description: "Full Page Archive creation has been triggered",
+        description: t("toasts.bookmarks.full_page_archive"),
       });
     },
     onError,
@@ -101,7 +98,7 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
   const removeFromListMutator = useRemoveBookmarkFromList({
     onSuccess: () => {
       toast({
-        description: "The bookmark has been deleted from the list",
+        description: t("toasts.bookmarks.delete_from_list"),
       });
     },
     onError,
@@ -111,6 +108,11 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
     <>
       {tagModal}
       {manageListsModal}
+      <DeleteBookmarkConfirmationDialog
+        bookmark={bookmark}
+        open={deleteBookmarkDialogOpen}
+        setOpen={setDeleteBookmarkDialogOpen}
+      />
       <BookmarkedTextEditor
         bookmark={bookmark}
         open={isTextEditorOpen}
@@ -145,7 +147,11 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
               className="mr-2 size-4"
               favourited={bookmark.favourited}
             />
-            <span>{bookmark.favourited ? "Un-favourite" : "Favourite"}</span>
+            <span>
+              {bookmark.favourited
+                ? t("actions.unfavorite")
+                : t("actions.favorite")}
+            </span>
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={demoMode}
@@ -160,7 +166,11 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
               className="mr-2 size-4"
               archived={bookmark.archived}
             />
-            <span>{bookmark.archived ? "Un-archive" : "Archive"}</span>
+            <span>
+              {bookmark.archived
+                ? t("actions.unarchive")
+                : t("actions.archive")}
+            </span>
           </DropdownMenuItem>
 
           {bookmark.content.type === BookmarkTypes.LINK && (
@@ -173,7 +183,7 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
               }}
             >
               <FileDown className="mr-2 size-4" />
-              <span>Download Full Page Archive</span>
+              <span>{t("actions.download_full_page_archive")}</span>
             </DropdownMenuItem>
           )}
 
@@ -184,38 +194,40 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
                   (bookmark.content as ZBookmarkedLink).url,
                 );
                 toast({
-                  description: "Link was added to your clipboard!",
+                  description: t("toasts.bookmarks.clipboard_copied"),
                 });
               }}
             >
               <Link className="mr-2 size-4" />
-              <span>Copy Link</span>
+              <span>{t("actions.copy_link")}</span>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onClick={() => setTagModalIsOpen(true)}>
             <Tags className="mr-2 size-4" />
-            <span>Edit Tags</span>
+            <span>{t("actions.edit_tags")}</span>
           </DropdownMenuItem>
 
           <DropdownMenuItem onClick={() => setManageListsModalOpen(true)}>
             <List className="mr-2 size-4" />
-            <span>Manage Lists</span>
+            <span>{t("actions.manage_lists")}</span>
           </DropdownMenuItem>
 
-          {listId && (
-            <DropdownMenuItem
-              disabled={demoMode}
-              onClick={() =>
-                removeFromListMutator.mutate({
-                  listId,
-                  bookmarkId: bookmark.id,
-                })
-              }
-            >
-              <ListX className="mr-2 size-4" />
-              <span>Remove from List</span>
-            </DropdownMenuItem>
-          )}
+          {listId &&
+            withinListContext &&
+            withinListContext.type === "manual" && (
+              <DropdownMenuItem
+                disabled={demoMode}
+                onClick={() =>
+                  removeFromListMutator.mutate({
+                    listId,
+                    bookmarkId: bookmark.id,
+                  })
+                }
+              >
+                <ListX className="mr-2 size-4" />
+                <span>{t("actions.remove_from_list")}</span>
+              </DropdownMenuItem>
+            )}
 
           {bookmark.content.type === BookmarkTypes.LINK && (
             <DropdownMenuItem
@@ -225,18 +237,16 @@ export default function BookmarkOptions({ bookmark }: { bookmark: ZBookmark }) {
               }
             >
               <RotateCw className="mr-2 size-4" />
-              <span>Refresh</span>
+              <span>{t("actions.refresh")}</span>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem
             disabled={demoMode}
             className="text-destructive"
-            onClick={() =>
-              deleteBookmarkMutator.mutate({ bookmarkId: bookmark.id })
-            }
+            onClick={() => setDeleteBookmarkDialogOpen(true)}
           >
             <Trash2 className="mr-2 size-4" />
-            <span>Delete</span>
+            <span>{t("actions.delete")}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

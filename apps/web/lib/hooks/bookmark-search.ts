@@ -1,17 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSortOrderStore } from "@/lib/store/useSortOrderStore";
 import { api } from "@/lib/trpc";
 import { keepPreviousData } from "@tanstack/react-query";
 
+import { parseSearchQuery } from "@hoarder/shared/searchQueryParser";
+
 function useSearchQuery() {
   const searchParams = useSearchParams();
-  const searchQuery = searchParams.get("q") ?? "";
-  return { searchQuery };
+  const searchQuery = decodeURIComponent(searchParams.get("q") ?? "");
+
+  const parsed = useMemo(() => parseSearchQuery(searchQuery), [searchQuery]);
+  return { searchQuery, parsedSearchQuery: parsed };
 }
 
 export function useDoBookmarkSearch() {
   const router = useRouter();
-  const { searchQuery } = useSearchQuery();
+  const { searchQuery, parsedSearchQuery } = useSearchQuery();
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | undefined>();
   const pathname = usePathname();
 
@@ -26,7 +31,7 @@ export function useDoBookmarkSearch() {
 
   const doSearch = (val: string) => {
     setTimeoutId(undefined);
-    router.replace(`/dashboard/search?q=${val}`);
+    router.replace(`/dashboard/search?q=${encodeURIComponent(val)}`);
   };
 
   const debounceSearch = (val: string) => {
@@ -43,33 +48,52 @@ export function useDoBookmarkSearch() {
     doSearch,
     debounceSearch,
     searchQuery,
+    parsedSearchQuery,
     isInSearchPage: pathname.startsWith("/dashboard/search"),
   };
 }
 
 export function useBookmarkSearch() {
   const { searchQuery } = useSearchQuery();
+  const sortOrder = useSortOrderStore((state) => state.sortOrder);
 
-  const { data, isPending, isPlaceholderData, error } =
-    api.bookmarks.searchBookmarks.useQuery(
-      {
-        text: searchQuery,
-      },
-      {
-        placeholderData: keepPreviousData,
-        gcTime: 0,
-      },
-    );
+  const {
+    data,
+    isPending,
+    isPlaceholderData,
+    error,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    refetch,
+  } = api.bookmarks.searchBookmarks.useInfiniteQuery(
+    {
+      text: searchQuery,
+      sortOrder,
+    },
+    {
+      placeholderData: keepPreviousData,
+      gcTime: 0,
+      initialCursor: null,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [refetch, sortOrder]);
 
   if (error) {
     throw error;
   }
 
   return {
-    searchQuery,
     error,
     data,
     isPending,
     isPlaceholderData,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   };
 }

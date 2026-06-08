@@ -738,6 +738,10 @@
         "admin_maintenance": {
           "title": "Завдання з адміністрування",
           "description": "Адміністративне очищення та обслуговування майна"
+        },
+        "embeddings": {
+          "title": "Завдання вбудовування",
+          "description": "Генерація векторних вбудовувань для закладок"
         }
       },
       "monitor_and_manage": "Моніторинг та управління чергами фонових завдань і системними задачами обробки",
@@ -772,7 +776,10 @@
         "migrate_large_link_html_content": "Перемістіть великий вбудований HTML-вміст до ресурсів",
         "recrawl_pending_links_only": "Повторно сканувати лише відкладені посилання",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Згенерувати теги ШІ лише для відкладених закладок",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Згенерувати зведення ШІ лише для відкладених закладок"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Згенерувати зведення ШІ лише для відкладених закладок",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Перегенерувати вбудовування лише для закладок у черзі",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Перегенерувати вбудовування лише для невдалих закладок",
+        "regenerate_embeddings_for_all_bookmarks": "Перегенерувати вбудовування для всіх закладок"
       }
     },
     "actions": {
@@ -810,7 +817,8 @@
         "not_configured": "Не налаштовано",
         "connected": "Підключено",
         "disconnected": "Відключено"
-      }
+      },
+      "vector_store": "Векторне сховище"
     },
     "admin_tools": {
       "admin_tools": "Інструменти адміністратора",
@@ -846,7 +854,10 @@
       "retag_queued": "Завдання повторного позначення теґами додано до черги",
       "resummarize_queued": "Завдання повторного підсумовування додано до черги",
       "view": "Перегляд",
-      "fetch_error": "Помилка отримання закладки"
+      "fetch_error": "Помилка отримання закладки",
+      "embedding_status": "Статус вбудовування",
+      "regenerate_embedding": "Перегенерувати вбудовування",
+      "regenerate_embedding_queued": "Завдання з регенерації вбудовування додано в чергу"
     }
   },
   "lists": {
@@ -1038,7 +1049,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Видалити закладку?",
-      "delete_confirmation_description": "Ви впевнені, що хочете видалити цю закладку?"
+      "delete_confirmation_description": "Ви впевнені, що хочете видалити цю закладку?",
+      "bulk_delete_confirmation_description": "Ви впевнені, що хочете видалити {{count}} закладок?"
     }
   },
   "options": {
@@ -1166,5 +1178,28 @@
     "download": "Завантажити",
     "close": "Закрити",
     "generating": "Генерування..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Гарячі клавіші",
+    "sections": {
+      "navigation": "Навігація",
+      "actions": "Дії",
+      "selection": "Вибір",
+      "other": "Інше"
+    },
+    "move_left": "Перемістити ліворуч",
+    "move_down": "Перемістити вниз",
+    "move_up": "Перемістити вгору",
+    "move_right": "Перемістити праворуч",
+    "open_bookmark": "Відкрити закладку",
+    "clear_focus": "Зняти фокус / вийти з масового редагування",
+    "toggle_favorite": "Додати/видалити з обраного",
+    "toggle_archive": "Архівувати / Розархівувати",
+    "delete_bookmark": "Видалити закладку",
+    "toggle_selection": "Перемкнути вибір",
+    "select_all": "Вибрати все",
+    "deselect_all": "Зняти вибір з усіх",
+    "show_help": "Показати гарячі клавіші",
+    "focus_search_alt": "Фокус на пошук"
   }
 }

@@ -923,6 +923,10 @@
         "admin_maintenance": {
           "title": "Tascanna Cothabhála Riaracháin",
           "description": "Glanadh riaracháin agus cothabháil sócmhainní"
+        },
+        "embeddings": {
+          "title": "Poist Leabaithe",
+          "description": "Giniúint leabaithe veicteora do leabharmharcaí"
         }
       },
       "monitor_and_manage": "Déan monatóireacht agus bainistigh scuainí post cúlra agus tascanna próiseála córais",
@@ -957,7 +961,10 @@
         "migrate_large_link_html_content": "Bog an HTML Mór Inlíne go Sócmhainní",
         "recrawl_pending_links_only": "Ath-rianasca na Naisc atá ar Feitheamh Amháin",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Athghin Clibeanna AI le haghaidh Leabharmharcanna atá ar Feitheamh Amháin",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Athghin Achoimrí AI le haghaidh Leabharmharcanna atá ar Feitheamh Amháin"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Athghin Achoimrí AI le haghaidh Leabharmharcanna atá ar Feitheamh Amháin",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Athghin Leabuithe do Leabharmharcaí ar Feitheamh Amháin",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Athghin Leabuithe do Leabharmharcaí ar Theip orthu Amháin",
+        "regenerate_embeddings_for_all_bookmarks": "Athghin Leabuithe do Gach Leabharmharc"
       }
     },
     "admin_settings": "Socruithe Riaracháin",
@@ -996,7 +1003,8 @@
         "not_configured": "Níl sé Cumraithe",
         "connected": "Ceangailte",
         "disconnected": "Dícheangailte"
-      }
+      },
+      "vector_store": "Stóras Veicteoirí"
     },
     "admin_tools": {
       "admin_tools": "Uirlisí Riaracháin",
@@ -1032,7 +1040,10 @@
       "retag_queued": "Cuireadh post ath-chlibeála i scuaine",
       "resummarize_queued": "Cuireadh post ath-achoimrithe i scuaine",
       "view": "Féach",
-      "fetch_error": "Earráid agus leabharmharc á fháil"
+      "fetch_error": "Earráid agus leabharmharc á fháil",
+      "embedding_status": "Stádas Leabaithe",
+      "regenerate_embedding": "Athghin Leabú",
+      "regenerate_embedding_queued": "Cuireadh an post athghinte leabaithe sa scuaine"
     }
   },
   "bookmark_editor": {
@@ -1080,7 +1091,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Scrios Leabharmharc?",
-      "delete_confirmation_description": "An bhfuil tú cinnte gur mhaith leat an leabhar marcála seo a scriosadh?"
+      "delete_confirmation_description": "An bhfuil tú cinnte gur mhaith leat an leabhar marcála seo a scriosadh?",
+      "bulk_delete_confirmation_description": "An bhfuil tú cinnte gur mhaith leat {{count}} leabharmhailc a scriosadh?"
     }
   },
   "banners": {
@@ -1166,5 +1178,28 @@
     "download": "Íoslódáil",
     "close": "Dún",
     "generating": "Ag giniúint..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Aicearraí Méarchláir",
+    "sections": {
+      "navigation": "Nascleanúint",
+      "actions": "Gníomhartha",
+      "selection": "Roghnú",
+      "other": "Eile"
+    },
+    "move_left": "Bog ar chlé",
+    "move_down": "Bog síos",
+    "move_up": "Bog suas",
+    "move_right": "Bog ar dheis",
+    "open_bookmark": "Oscail leabharmharc",
+    "clear_focus": "Glan an fócas / scoir an mór-eagarthóireacht",
+    "toggle_favorite": "Scorthaigh an ceanán",
+    "toggle_archive": "Cartlannaigh / Dí-chartlannaigh",
+    "delete_bookmark": "Scrios leabharmharc",
+    "toggle_selection": "Scorthaigh an roghnú",
+    "select_all": "Roghnaigh uile",
+    "deselect_all": "Díroghnaigh uile",
+    "show_help": "Taispeáin aicearraí méarchláir",
+    "focus_search_alt": "Fócas ar an gcuardach"
   }
 }

@@ -677,6 +677,10 @@
         "admin_maintenance": {
           "title": "Zadania konserwacyjne administratora",
           "description": "Administracyjne czyszczenie i konserwacja zasobów"
+        },
+        "embeddings": {
+          "title": "Zadania osadzania",
+          "description": "Generowanie osadzeń wektorowych dla zakładek"
         }
       },
       "monitor_and_manage": "Monitoruj i zarządzaj kolejkami zadań w tle i zadaniami przetwarzania systemu",
@@ -711,7 +715,10 @@
         "migrate_large_link_html_content": "Przenieś dużą zawartość HTML inline do zasobów.",
         "recrawl_pending_links_only": "Tylko ponowne przeszukiwanie oczekujących linków",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Tylko ponowne generowanie tagów AI dla oczekujących zakładek",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Tylko ponowne generowanie podsumowań AI dla oczekujących zakładek"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Tylko ponowne generowanie podsumowań AI dla oczekujących zakładek",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Regeneruj osadzenia tylko dla oczekujących zakładek",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Regeneruj osadzenia tylko dla nieudanych zakładek",
+        "regenerate_embeddings_for_all_bookmarks": "Regeneruj osadzenia dla wszystkich zakładek"
       }
     },
     "actions": {
@@ -736,7 +743,8 @@
         "not_configured": "Nieskonfigurowane",
         "connected": "Połączono",
         "disconnected": "Odłączono"
-      }
+      },
+      "vector_store": "Magazyn wektorowy"
     },
     "admin_tools": {
       "admin_tools": "Narzędzia administratora",
@@ -772,7 +780,10 @@
       "retag_queued": "Zadanie ponownego tagowania zostało dodane do kolejki",
       "resummarize_queued": "Zadanie ponownego podsumowania zostało dodane do kolejki",
       "view": "Wyświetl",
-      "fetch_error": "Błąd podczas pobierania zakładki"
+      "fetch_error": "Błąd podczas pobierania zakładki",
+      "embedding_status": "Status osadzania",
+      "regenerate_embedding": "Regeneruj osadzanie",
+      "regenerate_embedding_queued": "Zadanie regeneracji osadzania zostało dodane do kolejki"
     }
   },
   "tags": {
@@ -1077,7 +1088,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_description": "Na pewno chcesz usunąć ten zakładkę?",
-      "delete_confirmation_title": "Usunąć zakładkę?"
+      "delete_confirmation_title": "Usunąć zakładkę?",
+      "bulk_delete_confirmation_description": "Czy na pewno chcesz usunąć {{count}} zakładek?"
     }
   },
   "banners": {
@@ -1166,5 +1178,28 @@
     "download": "Pobierz",
     "close": "Zamknij",
     "generating": "Generowanie..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Skróty klawiszowe",
+    "sections": {
+      "navigation": "Nawigacja",
+      "actions": "Akcje",
+      "selection": "Wybór",
+      "other": "Inne"
+    },
+    "move_left": "Przesuń w lewo",
+    "move_down": "Przesuń w dół",
+    "move_up": "Przesuń w górę",
+    "move_right": "Przesuń w prawo",
+    "open_bookmark": "Otwórz zakładkę",
+    "clear_focus": "Usuń zaznaczenie / zakończ edycję zbiorczą",
+    "toggle_favorite": "Przełącz ulubione",
+    "toggle_archive": "Zarchiwizuj / Przywróć z archiwum",
+    "delete_bookmark": "Usuń zakładkę",
+    "toggle_selection": "Przełącz zaznaczenie",
+    "select_all": "Zaznacz wszystko",
+    "deselect_all": "Odznacz wszystko",
+    "show_help": "Pokaż skróty klawiszowe",
+    "focus_search_alt": "Ustaw fokus na wyszukiwanie"
   }
 }

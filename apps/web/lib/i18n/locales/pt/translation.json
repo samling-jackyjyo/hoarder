@@ -657,6 +657,10 @@
         "admin_maintenance": {
           "title": "Tarefas de Manutenção do Administrador",
           "description": "Limpeza administrativa e manutenção de ativos"
+        },
+        "embeddings": {
+          "title": "Trabalhos de Incorporação",
+          "description": "Geração de incorporação vetorial de favoritos"
         }
       },
       "monitor_and_manage": "Monitore e gerencie filas de tarefas em segundo plano e tarefas de processamento do sistema",
@@ -691,7 +695,10 @@
         "migrate_large_link_html_content": "Mover Conteúdo HTML Grande Embutido para Ativos",
         "recrawl_pending_links_only": "Rastrear Novamente Apenas Links Pendentes",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Regenerar Tags de IA Apenas para Favoritos Pendentes",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Regenerar Resumos de IA Apenas para Favoritos Pendentes"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Regenerar Resumos de IA Apenas para Favoritos Pendentes",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Regerar incorporações apenas para favoritos pendentes",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Regerar incorporações apenas para favoritos com falha",
+        "regenerate_embeddings_for_all_bookmarks": "Regerar incorporações para todos os favoritos"
       }
     },
     "actions": {
@@ -736,7 +743,8 @@
         "not_configured": "Não configurado",
         "connected": "Conectado",
         "disconnected": "Desconectado"
-      }
+      },
+      "vector_store": "Banco de Vetores"
     },
     "admin_tools": {
       "admin_tools": "Ferramentas de Administrador",
@@ -772,7 +780,10 @@
       "retag_queued": "O trabalho de marcação foi enfileirado",
       "resummarize_queued": "O trabalho de resumo foi enfileirado",
       "view": "Ver",
-      "fetch_error": "Erro ao buscar marcador"
+      "fetch_error": "Erro ao buscar marcador",
+      "embedding_status": "Status da Incorporação",
+      "regenerate_embedding": "Regerar Incorporação",
+      "regenerate_embedding_queued": "O trabalho de regeneração de incorporação foi colocado na fila"
     }
   },
   "options": {
@@ -1071,7 +1082,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Excluir marcador?",
-      "delete_confirmation_description": "Tens a certeza que queres apagar este marcador?"
+      "delete_confirmation_description": "Tens a certeza que queres apagar este marcador?",
+      "bulk_delete_confirmation_description": "Tem certeza de que deseja excluir {{count}} favoritos?"
     }
   },
   "layouts": {
@@ -1166,5 +1178,28 @@
     "download": "Baixar",
     "close": "Fechar",
     "generating": "Gerando..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Atalhos de teclado",
+    "sections": {
+      "navigation": "Navegação",
+      "actions": "Ações",
+      "selection": "Seleção",
+      "other": "Outros"
+    },
+    "move_left": "Mover para a esquerda",
+    "move_down": "Mover para baixo",
+    "move_up": "Mover para cima",
+    "move_right": "Mover para a direita",
+    "open_bookmark": "Abrir favorito",
+    "clear_focus": "Limpar foco / sair da edição em lote",
+    "toggle_favorite": "Alternar favorito",
+    "toggle_archive": "Arquivar / Desarquivar",
+    "delete_bookmark": "Excluir favorito",
+    "toggle_selection": "Alternar seleção",
+    "select_all": "Selecionar tudo",
+    "deselect_all": "Desmarcar tudo",
+    "show_help": "Mostrar atalhos de teclado",
+    "focus_search_alt": "Focar na busca"
   }
 }

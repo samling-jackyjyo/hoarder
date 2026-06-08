@@ -673,6 +673,10 @@
         "admin_maintenance": {
           "title": "مهام صيانة المسؤول",
           "description": "تنظيف إداري وصيانة للأصول"
+        },
+        "embeddings": {
+          "title": "وظائف التضمين",
+          "description": "توليد تضمين المتجهات للإشارات المرجعية"
         }
       },
       "monitor_and_manage": "مراقبة وإدارة قوائم انتظار الوظائف الخلفية ومهام معالجة النظام",
@@ -707,7 +711,10 @@
         "migrate_large_link_html_content": "نقل محتوى HTML كبير مضمّن إلى الأصول",
         "recrawl_pending_links_only": "إعادة فهرسة الروابط المعلّقة فقط",
         "regenerate_ai_tags_for_pending_bookmarks_only": "إعادة إنشاء وسوم الذكاء الاصطناعي للإشارات المرجعية المعلّقة فقط",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "إعادة إنشاء ملخصات الذكاء الاصطناعي للإشارات المرجعية المعلّقة فقط"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "إعادة إنشاء ملخصات الذكاء الاصطناعي للإشارات المرجعية المعلّقة فقط",
+        "regenerate_embeddings_for_pending_bookmarks_only": "إعادة توليد التضمينات للإشارات المرجعية المعلقة فقط",
+        "regenerate_embeddings_for_failed_bookmarks_only": "إعادة توليد التضمينات للإشارات المرجعية الفاشلة فقط",
+        "regenerate_embeddings_for_all_bookmarks": "إعادة توليد التضمينات لجميع الإشارات المرجعية"
       }
     },
     "actions": {
@@ -745,7 +752,8 @@
         "not_configured": "غير مهيأ",
         "connected": "متصل",
         "disconnected": "قطع الاتصال"
-      }
+      },
+      "vector_store": "مخزن المتجهات"
     },
     "admin_tools": {
       "admin_tools": "أدوات المشرف",
@@ -781,7 +789,10 @@
       "retag_queued": "تمت إضافة مهمة إعادة وضع العلامات إلى قائمة الانتظار",
       "resummarize_queued": "تمت إضافة مهمة إعادة التلخيص إلى قائمة الانتظار",
       "view": "عرض",
-      "fetch_error": "خطأ في جلب الإشارة المرجعية"
+      "fetch_error": "خطأ في جلب الإشارة المرجعية",
+      "embedding_status": "حالة التضمين",
+      "regenerate_embedding": "إعادة توليد التضمين",
+      "regenerate_embedding_queued": "تم وضع وظيفة إعادة توليد التضمين في قائمة الانتظار"
     }
   },
   "options": {
@@ -1045,7 +1056,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "حذف الإشارة المرجعية؟",
-      "delete_confirmation_description": "هل أنت متأكد من رغبتك في حذف هذه الإشارة المرجعية؟"
+      "delete_confirmation_description": "هل أنت متأكد من رغبتك في حذف هذه الإشارة المرجعية؟",
+      "bulk_delete_confirmation_description": "هل أنت متأكد من رغبتك في حذف {{count}} من الإشارات المرجعية؟"
     }
   },
   "toasts": {
@@ -1166,5 +1178,28 @@
     "download": "تنزيل",
     "close": "إغلاق",
     "generating": "جارٍ الإنشاء..."
+  },
+  "keyboard_shortcuts": {
+    "title": "اختصارات لوحة المفاتيح",
+    "sections": {
+      "navigation": "التنقل",
+      "actions": "الإجراءات",
+      "selection": "التحديد",
+      "other": "أخرى"
+    },
+    "move_left": "تحريك لليسار",
+    "move_down": "تحريك للأسفل",
+    "move_up": "تحريك للأعلى",
+    "move_right": "تحريك لليمين",
+    "open_bookmark": "فتح الإشارة المرجعية",
+    "clear_focus": "إلغاء التركيز / إنهاء التحرير الجماعي",
+    "toggle_favorite": "تبديل المفضلة",
+    "toggle_archive": "أرشفة / إلغاء الأرشفة",
+    "delete_bookmark": "حذف الإشارة المرجعية",
+    "toggle_selection": "تبديل التحديد",
+    "select_all": "تحديد الكل",
+    "deselect_all": "إلغاء تحديد الكل",
+    "show_help": "إظهار اختصارات لوحة المفاتيح",
+    "focus_search_alt": "التركيز على البحث"
   }
 }

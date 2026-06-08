@@ -673,6 +673,10 @@
         "admin_maintenance": {
           "title": "Yönetici Bakım İşleri",
           "description": "Yönetimsel temizlik ve varlık bakımı"
+        },
+        "embeddings": {
+          "title": "Yerleştirme İşleri",
+          "description": "Yer imi vektör yerleştirme oluşturma"
         }
       },
       "monitor_and_manage": "Arka plan iş kuyruklarını ve sistem işleme görevlerini izleyin ve yönetin",
@@ -707,7 +711,10 @@
         "migrate_large_link_html_content": "Büyük Satır İçi HTML İçeriğini Varlıklara Taşı",
         "recrawl_pending_links_only": "Sadece Bekleyen Bağlantıları Yeniden Tara",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Sadece Bekleyen Yer İşaretleri için Yapay Zeka Etiketlerini Yeniden Oluştur",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Sadece Bekleyen Yer İşaretleri için Yapay Zeka Özetlerini Yeniden Oluştur"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Sadece Bekleyen Yer İşaretleri için Yapay Zeka Özetlerini Yeniden Oluştur",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Yalnızca Bekleyen Yer İmleri İçin Yerleştirmeleri Yeniden Oluştur",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Yalnızca Başarısız Yer İmleri İçin Yerleştirmeleri Yeniden Oluştur",
+        "regenerate_embeddings_for_all_bookmarks": "Tüm Yer İmleri İçin Yerleştirmeleri Yeniden Oluştur"
       }
     },
     "actions": {
@@ -745,7 +752,8 @@
         "not_configured": "Yapılandırılmamış",
         "connected": "Bağlı",
         "disconnected": "Bağlantı Kesildi"
-      }
+      },
+      "vector_store": "Vektör Deposu"
     },
     "admin_tools": {
       "admin_tools": "Yönetici Araçları",
@@ -781,7 +789,10 @@
       "retag_queued": "Yeniden etiketleme işi sıraya alındı",
       "resummarize_queued": "Yeniden özetleme işi sıraya alındı",
       "view": "Görüntüle",
-      "fetch_error": "Yer işareti alınırken hata oluştu"
+      "fetch_error": "Yer işareti alınırken hata oluştu",
+      "embedding_status": "Yerleştirme Durumu",
+      "regenerate_embedding": "Yerleştirmeyi Yeniden Oluştur",
+      "regenerate_embedding_queued": "Yerleştirme yeniden oluşturma işi sıraya alındı"
     }
   },
   "options": {
@@ -1077,7 +1088,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_description": "Bu yer işaretini silmek istediğinden emin misin?",
-      "delete_confirmation_title": "Yer İşaretini Silmek İstiyor Musun?"
+      "delete_confirmation_title": "Yer İşaretini Silmek İstiyor Musun?",
+      "bulk_delete_confirmation_description": "{{count}} yer imleğini silmek istediğinizden emin misiniz?"
     }
   },
   "banners": {
@@ -1166,5 +1178,28 @@
     "download": "İndir",
     "close": "Kapat",
     "generating": "Oluşturuluyor..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Klavye Kısayolları",
+    "sections": {
+      "navigation": "Gezinti",
+      "actions": "İşlemler",
+      "selection": "Seçim",
+      "other": "Diğer"
+    },
+    "move_left": "Sola taşı",
+    "move_down": "Aşağı taşı",
+    "move_up": "Yukarı taşı",
+    "move_right": "Sağa taşı",
+    "open_bookmark": "Yer imini aç",
+    "clear_focus": "Odağı temizle / toplu düzenlemeden çık",
+    "toggle_favorite": "Favorilere ekle/çıkar",
+    "toggle_archive": "Arşivle / Arşivden çıkar",
+    "delete_bookmark": "Yer imini sil",
+    "toggle_selection": "Seçimi değiştir",
+    "select_all": "Tümünü seç",
+    "deselect_all": "Seçimi kaldır",
+    "show_help": "Klavye kısayollarını göster",
+    "focus_search_alt": "Aramaya odaklan"
   }
 }

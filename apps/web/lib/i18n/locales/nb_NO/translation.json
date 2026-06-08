@@ -115,6 +115,10 @@
         "admin_maintenance": {
           "title": "Admin-vedlikeholdsjobber",
           "description": "Administrativ opprydding og ressursvedlikehold"
+        },
+        "embeddings": {
+          "title": "Innbeddingsjobber",
+          "description": "Generering av vektorinnbedding for bokmerker"
         }
       },
       "monitor_and_manage": "Overvåk og administrer bakgrunnsjobbkøer og systembehandlingsoppgaver",
@@ -149,7 +153,10 @@
         "migrate_large_link_html_content": "Flytt stort HTML-innhold på nettet til aktiva",
         "recrawl_pending_links_only": "Bare skann ventende lenker på nytt",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Bare gjenopprett AI-tagger for ventende bokmerker",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Bare gjenopprett AI-sammendrag for ventende bokmerker"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Bare gjenopprett AI-sammendrag for ventende bokmerker",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Regenerer innbeddinger kun for ventende bokmerker",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Regenerer innbeddinger kun for feilede bokmerker",
+        "regenerate_embeddings_for_all_bookmarks": "Regenerer innbeddinger for alle bokmerker"
       }
     },
     "actions": {
@@ -175,7 +182,8 @@
         "not_configured": "Ikke konfigurert",
         "connected": "Tilkoblet",
         "disconnected": "Frakoblet"
-      }
+      },
+      "vector_store": "Vektorlager"
     },
     "admin_tools": {
       "admin_tools": "Admin-verktøy",
@@ -211,7 +219,10 @@
       "retag_queued": "Retaggingsjobb er lagt i kø",
       "resummarize_queued": "Oppsummeringsjobb er lagt i kø",
       "view": "Visning",
-      "fetch_error": "Feil ved henting av bokmerke"
+      "fetch_error": "Feil ved henting av bokmerke",
+      "embedding_status": "Innbeddingsstatus",
+      "regenerate_embedding": "Regenerer innbedding",
+      "regenerate_embedding_queued": "Jobb for regenerering av innbedding er lagt i kø"
     }
   },
   "actions": {
@@ -1077,7 +1088,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Slette bokmerke?",
-      "delete_confirmation_description": "Er du sikker på at du vil slette dette bokmerket?"
+      "delete_confirmation_description": "Er du sikker på at du vil slette dette bokmerket?",
+      "bulk_delete_confirmation_description": "Er du sikker på at du vil slette {{count}} bokmerker?"
     }
   },
   "banners": {
@@ -1166,5 +1178,28 @@
     "download": "Last ned",
     "close": "Lukk",
     "generating": "Genererer…"
+  },
+  "keyboard_shortcuts": {
+    "title": "Tastatursnarveier",
+    "sections": {
+      "navigation": "Navigering",
+      "actions": "Handlinger",
+      "selection": "Utvalg",
+      "other": "Annet"
+    },
+    "move_left": "Flytt til venstre",
+    "move_down": "Flytt ned",
+    "move_up": "Flytt opp",
+    "move_right": "Flytt til høyre",
+    "open_bookmark": "Åpne bokmerke",
+    "clear_focus": "Fjern fokus / avslutt masseredigering",
+    "toggle_favorite": "Veksle favoritt",
+    "toggle_archive": "Arkiver / Gjenopprett",
+    "delete_bookmark": "Slett bokmerke",
+    "toggle_selection": "Veksle utvalg",
+    "select_all": "Marker alle",
+    "deselect_all": "Avmarker alle",
+    "show_help": "Vis tastatursnarveier",
+    "focus_search_alt": "Fokuser på søk"
   }
 }

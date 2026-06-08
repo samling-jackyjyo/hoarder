@@ -670,6 +670,10 @@
         "admin_maintenance": {
           "title": "Wartungsaufgaben für Admins",
           "description": "Administrative Bereinigung und Anlagenwartung"
+        },
+        "embeddings": {
+          "title": "Embedding-Jobs",
+          "description": "Vektoreinbettungsgenerierung für Lesezeichen"
         }
       },
       "monitor_and_manage": "Überwachung und Verwaltung von Hintergrund-Job-Warteschlangen und Systemverarbeitungsaufgaben",
@@ -704,7 +708,10 @@
         "migrate_large_link_html_content": "Große Inline-HTML-Inhalte in Assets verschieben",
         "recrawl_pending_links_only": "Nur ausstehende Links neu crawlen",
         "regenerate_ai_tags_for_pending_bookmarks_only": "KI-Tags nur für ausstehende Bookmarks neu generieren",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "KI-Zusammenfassungen nur für ausstehende Bookmarks neu generieren"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "KI-Zusammenfassungen nur für ausstehende Bookmarks neu generieren",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Einbettungen nur für ausstehende Lesezeichen regenerieren",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Einbettungen nur für fehlgeschlagene Lesezeichen regenerieren",
+        "regenerate_embeddings_for_all_bookmarks": "Einbettungen für alle Lesezeichen regenerieren"
       }
     },
     "actions": {
@@ -742,7 +749,8 @@
         "not_configured": "Nicht konfiguriert",
         "connected": "Verbunden",
         "disconnected": "Getrennt"
-      }
+      },
+      "vector_store": "Vektorspeicher"
     },
     "admin_tools": {
       "admin_tools": "Admin Tools",
@@ -778,7 +786,10 @@
       "retag_queued": "Job zum Neuverschlagworten wurde in die Warteschlange gestellt",
       "resummarize_queued": "Job zum Neuzusammenfassen wurde in die Warteschlange gestellt",
       "view": "Anzeigen",
-      "fetch_error": "Fehler beim Abrufen des Lesezeichens"
+      "fetch_error": "Fehler beim Abrufen des Lesezeichens",
+      "embedding_status": "Embedding-Status",
+      "regenerate_embedding": "Einbettung regenerieren",
+      "regenerate_embedding_queued": "Job zur Regeneration der Einbettung wurde in die Warteschlange gestellt"
     }
   },
   "options": {
@@ -1028,7 +1039,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_description": "Bist du sicher, dass du das Lesezeichen löschen willst?",
-      "delete_confirmation_title": "Lesezeichen löschen?"
+      "delete_confirmation_title": "Lesezeichen löschen?",
+      "bulk_delete_confirmation_description": "Sind Sie sicher, dass Sie {{count}} Lesezeichen löschen möchten?"
     }
   },
   "search": {
@@ -1166,5 +1178,28 @@
     "download": "Herunterladen",
     "close": "Schließen",
     "generating": "Wird erstellt …"
+  },
+  "keyboard_shortcuts": {
+    "title": "Tastenkombinationen",
+    "sections": {
+      "navigation": "Navigation",
+      "actions": "Aktionen",
+      "selection": "Auswahl",
+      "other": "Sonstiges"
+    },
+    "move_left": "Nach links bewegen",
+    "move_down": "Nach unten bewegen",
+    "move_up": "Nach oben bewegen",
+    "move_right": "Nach rechts bewegen",
+    "open_bookmark": "Lesezeichen öffnen",
+    "clear_focus": "Fokus löschen / Massenbearbeitung beenden",
+    "toggle_favorite": "Favoriten umschalten",
+    "toggle_archive": "Archivieren / Dearchivieren",
+    "delete_bookmark": "Lesezeichen löschen",
+    "toggle_selection": "Auswahl umschalten",
+    "select_all": "Alle auswählen",
+    "deselect_all": "Auswahl aufheben",
+    "show_help": "Tastenkombinationen anzeigen",
+    "focus_search_alt": "Suche fokussieren"
   }
 }

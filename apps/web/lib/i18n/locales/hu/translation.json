@@ -862,6 +862,10 @@
         "admin_maintenance": {
           "title": "Admin karbantartási feladatok",
           "description": "Adminisztratív takarítás és eszközkarbantartás"
+        },
+        "embeddings": {
+          "title": "Beágyazási feladatok",
+          "description": "Könyvjelzők vektoros beágyazásának létrehozása"
         }
       },
       "monitor_and_manage": "Háttérfeladat-sorok és rendszerfeldolgozási feladatok figyelése és kezelése",
@@ -896,7 +900,10 @@
         "migrate_large_link_html_content": "Nagy méretű beágyazott HTML-tartalom áthelyezése az eszközökbe",
         "recrawl_pending_links_only": "Csak a függőben lévő linkek újbóli feltérképezése",
         "regenerate_ai_tags_for_pending_bookmarks_only": "AI-címkék újragenerálása csak a függőben lévő könyvjelzőkhöz",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "AI-összefoglalók újragenerálása csak a függőben lévő könyvjelzőkhöz"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "AI-összefoglalók újragenerálása csak a függőben lévő könyvjelzőkhöz",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Beágyazások újragenerálása csak a félben lévő könyvjelzőkhöz",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Beágyazások újragenerálása csak a sikertelen könyvjelzőkhöz",
+        "regenerate_embeddings_for_all_bookmarks": "Beágyazások újragenerálása az összes könyvjelzőhöz"
       }
     },
     "actions": {
@@ -941,7 +948,8 @@
         "not_configured": "Nincs konfigurálva",
         "connected": "Csatlakoztatva",
         "disconnected": "Szétkapcsolva"
-      }
+      },
+      "vector_store": "Vektortároló"
     },
     "admin_tools": {
       "admin_tools": "Adminisztrációs eszközök",
@@ -977,7 +985,10 @@
       "retag_queued": "Az újracímkézési feladat várólistára került",
       "resummarize_queued": "Az újraösszefoglalási feladat várólistára került",
       "view": "Megtekintés",
-      "fetch_error": "Hiba a könyvjelző lekérésekor"
+      "fetch_error": "Hiba a könyvjelző lekérésekor",
+      "embedding_status": "Beágyazási állapot",
+      "regenerate_embedding": "Beágyazás újragenerálása",
+      "regenerate_embedding_queued": "A beágyazás újragenerálási feladat sorba került"
     }
   },
   "options": {
@@ -1042,7 +1053,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Törli a könyvjelzőt?",
-      "delete_confirmation_description": "Biztos benne, hogy törli a könyvjelzőt?"
+      "delete_confirmation_description": "Biztos benne, hogy törli a könyvjelzőt?",
+      "bulk_delete_confirmation_description": "Biztosan törölni szeretne {{count}} könyvjelzőt?"
     }
   },
   "toasts": {
@@ -1166,5 +1178,28 @@
     "download": "Letöltés",
     "close": "Bezárás",
     "generating": "Generálás..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Billentyűkombinációk",
+    "sections": {
+      "navigation": "Navigáció",
+      "actions": "Műveletek",
+      "selection": "Kijelölés",
+      "other": "Egyéb"
+    },
+    "move_left": "Mozgatás balra",
+    "move_down": "Mozgatás lefelé",
+    "move_up": "Mozgatás felfelé",
+    "move_right": "Mozgatás jobbra",
+    "open_bookmark": "Könyvjelző megnyitása",
+    "clear_focus": "Fókusz törlése / kilépés a tömeges szerkesztésből",
+    "toggle_favorite": "Kedvenc váltása",
+    "toggle_archive": "Archiválás / Archiválás visszavonása",
+    "delete_bookmark": "Könyvjelző törlése",
+    "toggle_selection": "Kijelölés váltása",
+    "select_all": "Mind kijelölése",
+    "deselect_all": "Kijelölés megszüntetése",
+    "show_help": "Billentyűkombinációk megjelenítése",
+    "focus_search_alt": "Keresés fókuszálása"
   }
 }

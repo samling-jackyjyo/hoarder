@@ -623,6 +623,10 @@
         "admin_maintenance": {
           "title": "Công việc bảo trì quản trị",
           "description": "Dọn dẹp hành chính và bảo trì tài sản"
+        },
+        "embeddings": {
+          "title": "Công việc nhúng",
+          "description": "Tạo bản nhúng vector cho dấu trang"
         }
       },
       "monitor_and_manage": "Theo dõi và quản lý hàng đợi công việc nền và các tác vụ xử lý hệ thống",
@@ -657,7 +661,10 @@
         "migrate_large_link_html_content": "Chuyển Nội Dung HTML Lớn Nội Tuyến sang Tài Sản",
         "recrawl_pending_links_only": "Chỉ thu thập lại các liên kết đang chờ xử lý",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Chỉ tạo lại thẻ AI cho các dấu trang đang chờ xử lý",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Chỉ tạo lại tóm tắt AI cho các dấu trang đang chờ xử lý"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Chỉ tạo lại tóm tắt AI cho các dấu trang đang chờ xử lý",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Chỉ tạo lại bản nhúng cho các dấu trang đang chờ xử lý",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Chỉ tạo lại bản nhúng cho các dấu trang bị lỗi",
+        "regenerate_embeddings_for_all_bookmarks": "Tạo lại bản nhúng cho tất cả dấu trang"
       }
     },
     "admin_settings": "Cài đặt quản trị viên",
@@ -696,7 +703,8 @@
         "not_configured": "Chưa Cấu hình",
         "connected": "Đã kết nối",
         "disconnected": "Đã ngắt kết nối"
-      }
+      },
+      "vector_store": "Kho lưu trữ Vector"
     },
     "admin_tools": {
       "admin_tools": "Công cụ quản trị",
@@ -732,7 +740,10 @@
       "retag_queued": "Đã xếp hàng chờ việc gắn thẻ lại",
       "resummarize_queued": "Đã xếp hàng chờ việc tóm tắt lại",
       "view": "Xem",
-      "fetch_error": "Lỗi khi tìm nạp dấu trang"
+      "fetch_error": "Lỗi khi tìm nạp dấu trang",
+      "embedding_status": "Trạng thái nhúng",
+      "regenerate_embedding": "Tạo lại bản nhúng",
+      "regenerate_embedding_queued": "Công việc tạo lại bản nhúng đã được đưa vào hàng đợi"
     }
   },
   "common": {
@@ -1036,7 +1047,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Xóa dấu trang?",
-      "delete_confirmation_description": "Bạn có chắc chắn muốn xóa dấu trang này không?"
+      "delete_confirmation_description": "Bạn có chắc chắn muốn xóa dấu trang này không?",
+      "bulk_delete_confirmation_description": "Bạn có chắc chắn muốn xóa {{count}} dấu trang không?"
     }
   },
   "toasts": {
@@ -1166,5 +1178,28 @@
     "button": "Tổng Kết Năm 2025",
     "loading": "Đang tải Tổng Kết của bạn...",
     "failed_to_load": "Không tải được thống kê Tổng Kết của bạn"
+  },
+  "keyboard_shortcuts": {
+    "title": "Phím tắt",
+    "sections": {
+      "navigation": "Điều hướng",
+      "actions": "Hành động",
+      "selection": "Lựa chọn",
+      "other": "Khác"
+    },
+    "move_left": "Di chuyển sang trái",
+    "move_down": "Di chuyển xuống",
+    "move_up": "Di chuyển lên",
+    "move_right": "Di chuyển sang phải",
+    "open_bookmark": "Mở dấu trang",
+    "clear_focus": "Xóa tiêu điểm / thoát chỉnh sửa hàng loạt",
+    "toggle_favorite": "Chuyển đổi yêu thích",
+    "toggle_archive": "Lưu trữ / Hủy lưu trữ",
+    "delete_bookmark": "Xóa dấu trang",
+    "toggle_selection": "Chuyển đổi lựa chọn",
+    "select_all": "Chọn tất cả",
+    "deselect_all": "Bỏ chọn tất cả",
+    "show_help": "Hiển thị phím tắt",
+    "focus_search_alt": "Tiêu điểm tìm kiếm"
   }
 }

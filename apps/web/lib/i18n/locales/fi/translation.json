@@ -674,6 +674,10 @@
         "admin_maintenance": {
           "title": "Ylläpidon huoltotyöt",
           "description": "Hallinnollinen siivous ja resurssien ylläpito"
+        },
+        "embeddings": {
+          "title": "Upotustyöt",
+          "description": "Kirjanmerkkien vektoriupotusten luominen"
         }
       },
       "monitor_and_manage": "Seuraa ja hallitse taustatyöjonoja ja järjestelmän käsittelytehtäviä",
@@ -708,7 +712,10 @@
         "migrate_large_link_html_content": "Siirrä suurikokoinen sisäinen HTML-sisältö resurssitiedostoihin",
         "recrawl_pending_links_only": "Indeksoi odottavat linkit uudelleen",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Luo AI-tunnisteet uudelleen vain odottaville kirjanmerkeille",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Luo AI-yhteenvedot uudelleen vain odottaville kirjanmerkeille"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Luo AI-yhteenvedot uudelleen vain odottaville kirjanmerkeille",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Luo upotukset uudelleen vain odottaville kirjanmerkeille",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Luo upotukset uudelleen vain epäonnistuneille kirjanmerkeille",
+        "regenerate_embeddings_for_all_bookmarks": "Luo upotukset uudelleen kaikille kirjanmerkeille"
       }
     },
     "actions": {
@@ -746,7 +753,8 @@
         "not_configured": "Ei määritetty",
         "connected": "Yhdistetty",
         "disconnected": "Katkaistu yhteys"
-      }
+      },
+      "vector_store": "Vektorivarasto"
     },
     "admin_tools": {
       "admin_tools": "Ylläpitäjän työkalut",
@@ -782,7 +790,10 @@
       "retag_queued": "Uudelleentaggaus on jonossa",
       "resummarize_queued": "Uudelleenluonti on jonossa",
       "view": "Näytä",
-      "fetch_error": "Virhe kirjanmerkin noudossa"
+      "fetch_error": "Virhe kirjanmerkin noudossa",
+      "embedding_status": "Upotuksen tila",
+      "regenerate_embedding": "Luo upotus uudelleen",
+      "regenerate_embedding_queued": "Upotuksen uudelleenluontityö on lisätty jonoon"
     }
   },
   "options": {
@@ -1046,7 +1057,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Poistetaanko kirjanmerkki?",
-      "delete_confirmation_description": "Haluatko varmasti poistaa tämän kirjanmerkin?"
+      "delete_confirmation_description": "Haluatko varmasti poistaa tämän kirjanmerkin?",
+      "bulk_delete_confirmation_description": "Haluatko varmasti poistaa {{count}} kirjanmerkkiä?"
     }
   },
   "toasts": {
@@ -1167,5 +1179,28 @@
     "download": "Lataa",
     "close": "Sulje",
     "generating": "Luodaan..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Pikanäppäimet",
+    "sections": {
+      "navigation": "Navigointi",
+      "actions": "Toiminnot",
+      "selection": "Valinta",
+      "other": "Muut"
+    },
+    "move_left": "Siirrä vasemmalle",
+    "move_down": "Siirrä alas",
+    "move_up": "Siirrä ylös",
+    "move_right": "Siirrä oikealle",
+    "open_bookmark": "Avaa kirjanmerkki",
+    "clear_focus": "Tyhjennä kohdistus / poistu joukkomuokkauksesta",
+    "toggle_favorite": "Lisää/poista suosikki",
+    "toggle_archive": "Arkistoi / palauta arkistosta",
+    "delete_bookmark": "Poista kirjanmerkki",
+    "toggle_selection": "Valitse / poista valinta",
+    "select_all": "Valitse kaikki",
+    "deselect_all": "Poista kaikki valinnat",
+    "show_help": "Näytä pikanäppäimet",
+    "focus_search_alt": "Kohdista hakuun"
   }
 }

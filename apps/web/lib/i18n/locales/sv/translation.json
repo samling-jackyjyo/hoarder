@@ -670,6 +670,10 @@
         "admin_maintenance": {
           "title": "Admin Underhållsjobb",
           "description": "Administrativ rensning och underhåll av tillgångar"
+        },
+        "embeddings": {
+          "title": "Inbäddningsjobb",
+          "description": "Generering av vektorinbäddning för bokmärken"
         }
       },
       "monitor_and_manage": "Övervaka och hantera bakgrundsjobbköer och systembearbetningsuppgifter",
@@ -704,7 +708,10 @@
         "migrate_large_link_html_content": "Flytta stort HTML-innehåll i text till resurser",
         "recrawl_pending_links_only": "Kryp bara om väntande länkar",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Generera AI-taggar bara för väntande bokmärken",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Generera AI-sammanfattningar bara för väntande bokmärken"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Generera AI-sammanfattningar bara för väntande bokmärken",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Regenerera inbäddningar endast för väntande bokmärken",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Regenerera inbäddningar endast för misslyckade bokmärken",
+        "regenerate_embeddings_for_all_bookmarks": "Regenerera inbäddningar för alla bokmärken"
       }
     },
     "actions": {
@@ -742,7 +749,8 @@
         "not_configured": "Inte konfigurerad",
         "connected": "Ansluten",
         "disconnected": "Frånkopplad"
-      }
+      },
+      "vector_store": "Vektorlager"
     },
     "admin_tools": {
       "admin_tools": "Adminverktyg",
@@ -778,7 +786,10 @@
       "retag_queued": "Jobbet för att tagga om har köats",
       "resummarize_queued": "Jobbet för att sammanfatta om har köats",
       "view": "Visa",
-      "fetch_error": "Fel vid hämtning av bokmärke"
+      "fetch_error": "Fel vid hämtning av bokmärke",
+      "embedding_status": "Inbäddningsstatus",
+      "regenerate_embedding": "Regenerera inbäddning",
+      "regenerate_embedding_queued": "Jobb för regenerering av inbäddning har lagts i kö"
     }
   },
   "options": {
@@ -1025,7 +1036,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Ta bort bokmärke?",
-      "delete_confirmation_description": "Är du säker på att du vill ta bort det här bokmärket?"
+      "delete_confirmation_description": "Är du säker på att du vill ta bort det här bokmärket?",
+      "bulk_delete_confirmation_description": "Är du säker på att du vill radera {{count}} bokmärken?"
     }
   },
   "search": {
@@ -1166,5 +1178,28 @@
     "download": "Ladda ner",
     "close": "Stäng",
     "generating": "Genererar..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Tangentbordsgenvägar",
+    "sections": {
+      "navigation": "Navigering",
+      "actions": "Åtgärder",
+      "selection": "Markering",
+      "other": "Övrigt"
+    },
+    "move_left": "Flytta till vänster",
+    "move_down": "Flytta nedåt",
+    "move_up": "Flytta uppåt",
+    "move_right": "Flytta till höger",
+    "open_bookmark": "Öppna bokmärke",
+    "clear_focus": "Rensa fokus / avsluta massredigering",
+    "toggle_favorite": "Växla favorit",
+    "toggle_archive": "Arkivera / Återställ från arkiv",
+    "delete_bookmark": "Radera bokmärke",
+    "toggle_selection": "Växla markering",
+    "select_all": "Markera alla",
+    "deselect_all": "Avmarkera alla",
+    "show_help": "Visa tangentbordsgenvägar",
+    "focus_search_alt": "Fokusera på sök"
   }
 }

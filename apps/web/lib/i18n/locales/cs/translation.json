@@ -923,6 +923,10 @@
         "admin_maintenance": {
           "title": "Úlohy údržby správce",
           "description": "Administrativní úklid a údržba majetku"
+        },
+        "embeddings": {
+          "title": "Úlohy vkládání (embeddingů)",
+          "description": "Generování vektorových embeddingů záložek"
         }
       },
       "monitor_and_manage": "Monitoruj a spravuj fronty úloh na pozadí a úlohy zpracování systému.",
@@ -957,7 +961,10 @@
         "migrate_large_link_html_content": "Přesun velkého vloženého HTML obsahu do assetů",
         "recrawl_pending_links_only": "Znovu projít pouze čekající odkazy",
         "regenerate_ai_tags_for_pending_bookmarks_only": "Znovu vygenerovat AI tagy pouze pro čekající záložky",
-        "regenerate_ai_summaries_for_pending_bookmarks_only": "Znovu vygenerovat AI souhrny pouze pro čekající záložky"
+        "regenerate_ai_summaries_for_pending_bookmarks_only": "Znovu vygenerovat AI souhrny pouze pro čekající záložky",
+        "regenerate_embeddings_for_pending_bookmarks_only": "Přegenerovat embeddingy pouze pro čekající záložky",
+        "regenerate_embeddings_for_failed_bookmarks_only": "Přegenerovat embeddingy pouze pro neúspěšné záložky",
+        "regenerate_embeddings_for_all_bookmarks": "Přegenerovat embeddingy pro všechny záložky"
       }
     },
     "admin_settings": "Nastavení správce",
@@ -996,7 +1003,8 @@
         "not_configured": "Nenakonfigurováno",
         "connected": "Připojeno",
         "disconnected": "Odpojeno"
-      }
+      },
+      "vector_store": "Vektorové úložiště"
     },
     "admin_tools": {
       "admin_tools": "Nástroje správce",
@@ -1032,7 +1040,10 @@
       "retag_queued": "Úloha pro opětovné označení byla zařazena do fronty",
       "resummarize_queued": "Úloha pro opětovné shrnutí byla zařazena do fronty",
       "view": "Zobrazit",
-      "fetch_error": "Chyba při načítání záložky"
+      "fetch_error": "Chyba při načítání záložky",
+      "embedding_status": "Stav embeddingu",
+      "regenerate_embedding": "Přegenerovat embedding",
+      "regenerate_embedding_queued": "Úloha na přegenerování embeddingu byla zařazena do fronty"
     }
   },
   "bookmark_editor": {
@@ -1080,7 +1091,8 @@
   "dialogs": {
     "bookmarks": {
       "delete_confirmation_title": "Smazat záložku?",
-      "delete_confirmation_description": "Určitě chceš smazat tuto záložku?"
+      "delete_confirmation_description": "Určitě chceš smazat tuto záložku?",
+      "bulk_delete_confirmation_description": "Opravdu chcete smazat {{count}} záložek?"
     }
   },
   "banners": {
@@ -1166,5 +1178,28 @@
     "download": "Stáhnout",
     "close": "Zavřít",
     "generating": "Generuji..."
+  },
+  "keyboard_shortcuts": {
+    "title": "Klávesové zkratky",
+    "sections": {
+      "navigation": "Navigace",
+      "actions": "Akce",
+      "selection": "Výběr",
+      "other": "Ostatní"
+    },
+    "move_left": "Posunout doleva",
+    "move_down": "Posunout dolů",
+    "move_up": "Posunout nahoru",
+    "move_right": "Posunout doprava",
+    "open_bookmark": "Otevřít záložku",
+    "clear_focus": "Zrušit zaměření / ukončit hromadné úpravy",
+    "toggle_favorite": "Přepnout oblíbené",
+    "toggle_archive": "Archivovat / Obnovit z archivu",
+    "delete_bookmark": "Smazat záložku",
+    "toggle_selection": "Přepnout výběr",
+    "select_all": "Vybrat vše",
+    "deselect_all": "Odznačit vše",
+    "show_help": "Zobrazit klávesové zkratky",
+    "focus_search_alt": "Zaměřit vyhledávání"
   }
 }

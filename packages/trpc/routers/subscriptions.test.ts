@@ -696,6 +696,185 @@ describe("Subscription Routes", () => {
       expect(subscription?.endDate).toBeNull();
     });
 
+    test<CustomTestContext>("keeps the active yearly plan when the old monthly subscription is deleted", async ({
+      db,
+      unauthedAPICaller,
+    }) => {
+      const user = await unauthedAPICaller.users.create({
+        name: "Test User",
+        email: "test@test.com",
+        password: "pass1234",
+        confirmPassword: "pass1234",
+      });
+
+      // User has already upgraded to yearly; the active yearly subscription is
+      // what's currently recorded.
+      await db.insert(subscriptions).values({
+        userId: user.id,
+        stripeCustomerId: "cus_123",
+        stripeSubscriptionId: "sub_yearly",
+        status: "active",
+        tier: "paid",
+        priceId: "price_yearly_123",
+      });
+
+      // The old monthly subscription finally expires and fires a deleted event.
+      const mockEvent = {
+        type: "customer.subscription.deleted",
+        data: {
+          object: {
+            id: "sub_monthly",
+            customer: "cus_123",
+            metadata: {
+              userId: user.id,
+            },
+          },
+        },
+      };
+
+      // Stripe still has both subscriptions: the just-canceled monthly one
+      // (listed first) and the active yearly one. A naive data[0] would pick
+      // the canceled monthly sub and wrongly downgrade the user to free.
+      mockSubscriptionsList.mockResolvedValue({
+        data: [
+          {
+            id: "sub_monthly",
+            status: "canceled",
+            cancel_at_period_end: false,
+            items: {
+              data: [
+                {
+                  price: { id: "price_123" },
+                  current_period_start: 1640995200, // 2022-01-01
+                  current_period_end: 1643673600, // 2022-02-01
+                },
+              ],
+            },
+          },
+          {
+            id: "sub_yearly",
+            status: "active",
+            cancel_at_period_end: false,
+            items: {
+              data: [
+                {
+                  price: { id: "price_yearly_123" },
+                  current_period_start: 1640995200, // 2022-01-01
+                  current_period_end: 1672531200, // 2023-01-01
+                },
+              ],
+            },
+          },
+        ],
+      });
+
+      mockWebhooksConstructEvent.mockReturnValue(mockEvent);
+
+      const result = await unauthedAPICaller.subscriptions.handleWebhook({
+        body: "webhook-body",
+        signature: "webhook-signature",
+      });
+
+      expect(result).toEqual({ received: true });
+
+      const subscription = await db.query.subscriptions.findFirst({
+        where: eq(subscriptions.userId, user.id),
+      });
+
+      // The user stays on the active yearly plan rather than being downgraded.
+      expect(subscription?.status).toBe("active");
+      expect(subscription?.tier).toBe("paid");
+      expect(subscription?.stripeSubscriptionId).toBe("sub_yearly");
+      expect(subscription?.priceId).toBe("price_yearly_123");
+      expect(subscription?.endDate).toEqual(new Date(1672531200 * 1000));
+    });
+
+    test<CustomTestContext>("selects the active subscription with the latest end date when multiple overlap", async ({
+      db,
+      unauthedAPICaller,
+    }) => {
+      const user = await unauthedAPICaller.users.create({
+        name: "Test User",
+        email: "test@test.com",
+        password: "pass1234",
+        confirmPassword: "pass1234",
+      });
+
+      await db.insert(subscriptions).values({
+        userId: user.id,
+        stripeCustomerId: "cus_123",
+        stripeSubscriptionId: "sub_monthly",
+        status: "active",
+        tier: "paid",
+        priceId: "price_123",
+      });
+
+      const mockEvent = {
+        type: "customer.subscription.updated",
+        data: {
+          object: {
+            id: "sub_yearly",
+            customer: "cus_123",
+            metadata: {
+              userId: user.id,
+            },
+          },
+        },
+      };
+
+      // Both subscriptions are still active during the upgrade overlap. The
+      // monthly one is listed first, but the yearly one extends further into
+      // the future and should win.
+      mockSubscriptionsList.mockResolvedValue({
+        data: [
+          {
+            id: "sub_monthly",
+            status: "active",
+            cancel_at_period_end: true,
+            items: {
+              data: [
+                {
+                  price: { id: "price_123" },
+                  current_period_start: 1640995200, // 2022-01-01
+                  current_period_end: 1643673600, // 2022-02-01
+                },
+              ],
+            },
+          },
+          {
+            id: "sub_yearly",
+            status: "active",
+            cancel_at_period_end: false,
+            items: {
+              data: [
+                {
+                  price: { id: "price_yearly_123" },
+                  current_period_start: 1640995200, // 2022-01-01
+                  current_period_end: 1672531200, // 2023-01-01
+                },
+              ],
+            },
+          },
+        ],
+      });
+
+      mockWebhooksConstructEvent.mockReturnValue(mockEvent);
+
+      await unauthedAPICaller.subscriptions.handleWebhook({
+        body: "webhook-body",
+        signature: "webhook-signature",
+      });
+
+      const subscription = await db.query.subscriptions.findFirst({
+        where: eq(subscriptions.userId, user.id),
+      });
+
+      expect(subscription?.stripeSubscriptionId).toBe("sub_yearly");
+      expect(subscription?.priceId).toBe("price_yearly_123");
+      expect(subscription?.cancelAtPeriodEnd).toBe(false);
+      expect(subscription?.endDate).toEqual(new Date(1672531200 * 1000));
+    });
+
     test<CustomTestContext>("acknowledges webhook for unknown Stripe customer", async ({
       unauthedAPICaller,
     }) => {

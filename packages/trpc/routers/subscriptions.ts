@@ -130,7 +130,7 @@ async function syncStripeDataToDatabase(customerId: string, db: Context["db"]) {
     try {
       const subscriptionsList = await stripe.subscriptions.list({
         customer: customerId,
-        limit: 1,
+        limit: 100,
         status: "all",
       });
 
@@ -176,7 +176,27 @@ async function syncStripeDataToDatabase(customerId: string, db: Context["db"]) {
         return;
       }
 
-      const subscription = subscriptionsList.data[0];
+      // A customer can have more than one subscription. For example, while
+      // upgrading from a monthly to a yearly plan the old monthly subscription
+      // lingers until its period ends. The subscription that reflects the
+      // user's entitlement is the active/trialing one whose period extends
+      // furthest into the future: when the old monthly plan is finally
+      // canceled it fires `customer.subscription.deleted`, and a naive
+      // `data[0]` (or `limit: 1`) can pick up that canceled subscription and
+      // wrongly downgrade a user who still has an active yearly plan. Prefer
+      // the active/trialing subscription with the latest end date, and only
+      // fall back to the newest one when none are active.
+      const periodEnd = (sub: Stripe.Subscription) =>
+        sub.items.data[0]?.current_period_end ?? 0;
+      const activeSubscriptions = subscriptionsList.data.filter(
+        (sub) => sub.status === "active" || sub.status === "trialing",
+      );
+      const subscription =
+        activeSubscriptions.length > 0
+          ? activeSubscriptions.reduce((latest, sub) =>
+              periodEnd(sub) > periodEnd(latest) ? sub : latest,
+            )
+          : subscriptionsList.data[0];
       const subscriptionItem = subscription.items.data[0];
 
       const subData = {

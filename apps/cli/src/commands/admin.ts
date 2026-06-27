@@ -535,3 +535,30 @@ jobsCmd
   });
 
 adminCmd.addCommand(jobsCmd);
+
+// --- Subscriptions subcommand (cloud only) ---
+
+if (process.env.KARAKEEP_CLOUD === "1") {
+  const subscriptionsCmd = new Command()
+    .name("subscriptions")
+    .description("admin subscription management commands");
+
+  subscriptionsCmd
+    .command("sync")
+    .description("force a Stripe sync for a specific user")
+    .argument("<userId>", "the id of the user to sync")
+    .action(async (userId) => {
+      const api = getAPIClient();
+      try {
+        await api.admin.forceStripeSync.mutate({ userId });
+        printStatusMessage(true, "Stripe sync completed successfully");
+      } catch (error) {
+        printErrorMessageWithReason(
+          "Failed to sync user with Stripe",
+          error as object,
+        );
+      }
+    });
+
+  adminCmd.addCommand(subscriptionsCmd);
+}

@@ -3,7 +3,13 @@ import { TRPCError } from "@trpc/server";
 import { and, asc, count, eq, gt, inArray, or, sum } from "drizzle-orm";
 import { z } from "zod";
 
-import { assets, bookmarkLinks, bookmarks, users } from "@karakeep/db/schema";
+import {
+  assets,
+  bookmarkLinks,
+  bookmarks,
+  subscriptions,
+  users,
+} from "@karakeep/db/schema";
 import {
   AdminMaintenanceQueue,
   AssetPreprocessingQueue,
@@ -37,6 +43,7 @@ import { generatePasswordSalt, hashPassword } from "../auth";
 import { createAdminScopedProcedure, router } from "../index";
 import { Bookmark } from "../models/bookmarks";
 import { User } from "../models/users";
+import { syncStripeDataToDatabase } from "./subscriptions";
 
 const adminBookmarksProcedure = createAdminScopedProcedure("bookmarks");
 const adminJobsProcedure = createAdminScopedProcedure("jobs");
@@ -925,5 +932,24 @@ export const adminAppRouter = router({
           groupId: "admin",
         },
       );
+    }),
+  forceStripeSync: adminSystemProcedure
+    .input(z.object({ userId: z.string() }))
+    .output(z.object({ success: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      const subscription = await ctx.db.query.subscriptions.findFirst({
+        where: eq(subscriptions.userId, input.userId),
+      });
+
+      if (!subscription?.stripeCustomerId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No Stripe customer found for the given user",
+        });
+      }
+
+      await syncStripeDataToDatabase(subscription.stripeCustomerId, ctx.db);
+
+      return { success: true };
     }),
 });

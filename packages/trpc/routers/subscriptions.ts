@@ -93,7 +93,10 @@ function computeSubscriptionTransition(
   return "no_change";
 }
 
-async function syncStripeDataToDatabase(customerId: string, db: Context["db"]) {
+export async function syncStripeDataToDatabase(
+  customerId: string,
+  db: Context["db"],
+) {
   return withEventLog("subscription.synced", async () => {
     addLogFields<"subscription.synced">({
       "stripe.customer_id": customerId,

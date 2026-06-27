@@ -122,7 +122,6 @@ RUN apt-get update \
         curl \
         graphicsmagick \
         ghostscript \
-        libjemalloc2 \
         ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
@@ -152,14 +151,6 @@ COPY --from=monolith_builder /usr/local/cargo/bin/monolith /usr/local/bin/monoli
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXTAUTH_URL_INTERNAL=http://localhost:${PORT}
-
-# Create symlink for jemalloc based on architecture
-ARG TARGETARCH
-RUN if [ "$TARGETARCH" = "arm64" ]; then \
-        ln -s /usr/lib/aarch64-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so; \
-    else \
-        ln -s /usr/lib/x86_64-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so; \
-    fi
 
 COPY --from=base --chown=node:node /app/apps/web/.next/standalone ./
 COPY --from=base /app/apps/web/public ./apps/web/public

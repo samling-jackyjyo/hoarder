@@ -7,6 +7,8 @@ import { Transform } from "stream";
 import { pipeline } from "stream/promises";
 import { PlaywrightBlocker } from "@ghostery/adblocker-playwright";
 import { Mutex } from "async-mutex";
+import { dataUriToBuffer } from "data-uri-to-buffer";
+import type { MimeBuffer } from "data-uri-to-buffer";
 import { and, eq } from "drizzle-orm";
 import { execa } from "execa";
 import { exitAbortController } from "exit";
@@ -1366,6 +1368,82 @@ async function storePdf(
   );
 }
 
+/**
+ * SingleFile / precrawled archives inline images as `data:` URIs, so the image
+ * URL metascraper extracts can be a base64 blob rather than something fetchable
+ * over the network. Decode it locally and store it as an asset instead of
+ * failing on the unsupported protocol.
+ */
+async function storeDataUriAsset(
+  url: string,
+  userId: string,
+  jobId: string,
+  fileType: string,
+) {
+  const maxBytes = serverConfig.maxAssetSizeMb * 1024 * 1024;
+
+  // Guardrail 1: cap the size *before* decoding into memory. base64 encodes 3
+  // bytes per 4 chars, so a URI longer than 4/3 the limit (plus header slack)
+  // must decode past it; the exact check below handles the rest.
+  if (url.length > Math.ceil((maxBytes * 4) / 3) + 1024) {
+    logger.warn(
+      `[Crawler][${jobId}] Skipping data URI ${fileType}: encoded size (${url.length} chars) exceeds maximum allowed size of ${serverConfig.maxAssetSizeMb}MB`,
+    );
+    return null;
+  }
+
+  let asset: MimeBuffer;
+  try {
+    asset = dataUriToBuffer(url);
+  } catch (e) {
+    logger.error(
+      `[Crawler][${jobId}] Failed to decode data URI ${fileType}: ${e}`,
+    );
+    return null;
+  }
+
+  // Guardrail 2: never trust the declared mediatype for anything but the raster
+  // image types we actually serve as banners. Rejects svg/html/etc.;
+  // saveAsset's SUPPORTED_ASSET_TYPES check is the backstop.
+  const contentType = normalizeContentType(asset.type);
+  if (!contentType || !IMAGE_ASSET_TYPES.has(contentType)) {
+    logger.warn(
+      `[Crawler][${jobId}] Skipping data URI ${fileType} with unsupported content type: ${contentType}`,
+    );
+    return null;
+  }
+
+  if (asset.byteLength > maxBytes) {
+    logger.warn(
+      `[Crawler][${jobId}] Skipping data URI ${fileType}: decoded size (${asset.byteLength} bytes) exceeds maximum allowed size of ${serverConfig.maxAssetSizeMb}MB`,
+    );
+    return null;
+  }
+
+  const { data: quotaApproved, error: quotaError } = await tryCatch(
+    QuotaService.checkStorageQuota(db, userId, asset.byteLength),
+  );
+  if (quotaError) {
+    logger.warn(
+      `[Crawler][${jobId}] Skipping data URI ${fileType} storage due to quota exceeded: ${quotaError.message}`,
+    );
+    return null;
+  }
+
+  const assetId = newAssetId();
+  await saveAsset({
+    userId,
+    assetId,
+    metadata: { contentType },
+    asset,
+    quotaApproved,
+  });
+  logger.info(
+    `[Crawler][${jobId}] Stored data URI ${fileType} as assetId: ${assetId} (${asset.byteLength} bytes)`,
+  );
+  return { assetId, userId, contentType, size: asset.byteLength };
+}
+
 async function downloadAndStoreFile(
   url: string,
   userId: string,
@@ -1389,6 +1467,9 @@ async function downloadAndStoreFile(
     async () => {
       let assetPath: string | undefined;
       try {
+        if (url.startsWith("data:")) {
+          return await storeDataUriAsset(url, userId, jobId, fileType);
+        }
         logger.info(
           `[Crawler][${jobId}] Downloading ${fileType} from "${truncateUrl(url)}"`,
         );

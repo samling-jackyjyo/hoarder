@@ -369,6 +369,38 @@ export class CrawlerWorker {
     return CrawlerWorker.initPromise;
   }
 
+  // Boots the browser/adblocker/cookies without the queue runner. Used by the
+  // adhoc crawl CLI (scripts/crawlAdhoc.ts).
+  static async prepareForAdhoc(): Promise<void> {
+    await CrawlerWorker.ensureInitialized();
+
+    // The adhoc CLI exists to exercise the REAL browser path. When no browser is
+    // reachable, crawlPage() silently falls back to a plain HTTP fetch
+    // (browserlessCrawlPage), which would quietly corrupt A/B results with a run
+    // that never executed JS/screenshots. Fail loudly instead. Two cases where
+    // the fallback is silent: no browser is configured at all, and a
+    // non-on-demand connection that failed to establish at init (globalBrowser
+    // stays undefined). On-demand connections throw per-crawl, so those surface
+    // as visible errors already.
+    const hasBrowserBackend =
+      !!serverConfig.crawler.browserWebUrl ||
+      !!serverConfig.crawler.browserWebSocketUrl;
+    if (!hasBrowserBackend) {
+      throw new Error(
+        "[adhoc] No browser backend configured — refusing to run. crawlPage() " +
+          "would silently fall back to a plain HTTP fetch. Set BROWSER_WEB_URL " +
+          "or BROWSER_WEBSOCKET_URL to a reachable Chrome.",
+      );
+    }
+    if (!serverConfig.crawler.browserConnectOnDemand && !globalBrowser) {
+      throw new Error(
+        "[adhoc] Browser failed to connect — refusing to run. crawlPage() would " +
+          "silently fall back to a plain HTTP fetch. Check that BROWSER_WEB_URL / " +
+          "BROWSER_WEBSOCKET_URL points at a reachable Chrome.",
+      );
+    }
+  }
+
   static async build(queue: Queue<ZCrawlLinkRequest>) {
     await CrawlerWorker.ensureInitialized();
 
@@ -531,13 +563,16 @@ async function browserlessCrawlPage(
   );
 }
 
-async function crawlPage(
+export async function crawlPage(
   jobId: string,
   url: string,
   userId: string,
   forceStorePdf: boolean,
   abortSignal: AbortSignal,
   runProxy: RunProxyConfig,
+  // When set, skips the per-user browserCrawlingEnabled DB lookup and uses this
+  // value instead. Used by the adhoc crawl CLI, which has no user row.
+  browserCrawlingEnabledOverride?: boolean,
 ): Promise<{
   htmlContent: string;
   screenshot: Buffer | undefined;
@@ -558,16 +593,20 @@ async function crawlPage(
       },
     },
     async () => {
-      const userData = await db.query.users.findFirst({
-        where: eq(users.id, userId),
-        columns: { browserCrawlingEnabled: true },
-      });
-      if (!userData) {
-        logger.error(`[Crawler][${jobId}] User ${userId} not found`);
-        throw new Error(`User ${userId} not found`);
+      let browserCrawlingEnabled: boolean | null;
+      if (browserCrawlingEnabledOverride !== undefined) {
+        browserCrawlingEnabled = browserCrawlingEnabledOverride;
+      } else {
+        const userData = await db.query.users.findFirst({
+          where: eq(users.id, userId),
+          columns: { browserCrawlingEnabled: true },
+        });
+        if (!userData) {
+          logger.error(`[Crawler][${jobId}] User ${userId} not found`);
+          throw new Error(`User ${userId} not found`);
+        }
+        browserCrawlingEnabled = userData.browserCrawlingEnabled;
       }
-
-      const browserCrawlingEnabled = userData.browserCrawlingEnabled;
 
       if (browserCrawlingEnabled !== null && !browserCrawlingEnabled) {
         return browserlessCrawlPage(jobId, url, abortSignal, runProxy);

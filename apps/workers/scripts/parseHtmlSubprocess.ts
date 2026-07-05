@@ -84,16 +84,32 @@ const LAZY_SRC_ATTRS = [
   "data-url",
 ];
 
+function isPlaceholderDataImage(src: string): boolean {
+  // Tiny data-URI images are commonly used as lazy-load placeholders. Do not
+  // treat every data:image/gif as a placeholder: SingleFile and some sites
+  // inline real GIF assets as data URIs, and replacing those with a lazy
+  // attribute URL makes the saved reader content depend on the remote image.
+  // 200 chars is a deliberately generous cutoff: a 1x1 transparent GIF/PNG
+  // placeholder is only ~60-100 chars, while a real inlined image is many KB,
+  // so anything under this limit is safely a placeholder rather than an asset.
+  const PLACEHOLDER_MAX_LENGTH = 200;
+  const normalizedSrc = src.replace(/\s/g, "").toLowerCase();
+  return (
+    normalizedSrc.length <= PLACEHOLDER_MAX_LENGTH &&
+    (normalizedSrc.startsWith("data:image/gif") ||
+      normalizedSrc.startsWith("data:image/png"))
+  );
+}
+
 function normalizeLazyLoadImages(document: Document): void {
   const images = document.querySelectorAll("img");
   for (const img of images) {
-    // Only fill in src if it is absent or a known placeholder (blank / data:)
+    // Only fill in src if it is absent or a known tiny placeholder. Real
+    // inlined GIF/PNG data URIs must be preserved so archived content keeps
+    // the saved image rather than falling back to a remote lazy-load URL.
     const currentSrc = img.getAttribute("src") ?? "";
     const needsSrc =
-      !currentSrc ||
-      currentSrc === "#" ||
-      currentSrc.startsWith("data:image/gif") ||
-      currentSrc.startsWith("data:image/png");
+      !currentSrc || currentSrc === "#" || isPlaceholderDataImage(currentSrc);
 
     if (!needsSrc) {
       continue;

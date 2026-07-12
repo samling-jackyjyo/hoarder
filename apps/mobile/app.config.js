@@ -14,17 +14,18 @@ export default {
     slug: "hoarder",
     version: "1.9.5",
     orientation: "portrait",
-    icon: {
-      light: "./assets/icon.png",
-      tinted: "./assets/icon-tinted.png",
-    },
-    experiments: {
-      reactCanary: true,
-    },
+    icon: "./assets/icon.png",
     userInterfaceStyle: "automatic",
     assetBundlePatterns: ["**/*"],
+    experiments: {
+      reactCompiler: true,
+    },
     ios: {
       supportsTablet: true,
+      icon: {
+        light: "./assets/icon.png",
+        tinted: "./assets/icon-tinted.png",
+      },
       bundleIdentifier: IS_DEV
         ? "app.hoarder.hoardermobile.dev"
         : "app.hoarder.hoardermobile",
@@ -102,11 +103,12 @@ export default {
         {
           android: {
             usesCleartextTraffic: true,
-            targetSdkVersion: 35,
+            targetSdkVersion: 36,
             ndkVersion: "27.1.12297006",
           },
         },
       ],
+      "expo-sharing",
       "expo-web-browser",
       [
         "@sentry/react-native/expo",

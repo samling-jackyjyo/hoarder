@@ -20,7 +20,7 @@ type Mode =
   | { type: "idle" }
   | { type: "success"; bookmarkId: string }
   | { type: "alreadyExists"; bookmarkId: string }
-  | { type: "error" };
+  | { type: "error"; message: string };
 
 function SaveBookmark({ setMode }: { setMode: (mode: Mode) => void }) {
   const api = useTRPC();
@@ -39,8 +39,8 @@ function SaveBookmark({ setMode }: { setMode: (mode: Mode) => void }) {
   const { settings, isLoading } = useAppSettings();
   const { uploadAsset } = useUploadAsset(settings, {
     onSuccess: onSaved,
-    onError: () => {
-      setMode({ type: "error" });
+    onError: (message) => {
+      setMode({ type: "error", message });
     },
   });
 
@@ -85,8 +85,8 @@ function SaveBookmark({ setMode }: { setMode: (mode: Mode) => void }) {
   const { mutate, isPending } = useMutation(
     api.bookmarks.createBookmark.mutationOptions({
       onSuccess: onSaved,
-      onError: () => {
-        setMode({ type: "error" });
+      onError: (error) => {
+        setMode({ type: "error", message: error.message });
       },
     }),
   );
@@ -201,7 +201,7 @@ export default function Sharing() {
               Oops!
             </Text>
             <Text variant="body" className="text-muted-foreground">
-              Something went wrong
+              {mode.message}
             </Text>
           </Animated.View>
 

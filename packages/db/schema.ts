@@ -686,6 +686,7 @@ export const rssFeedImportsTable = sqliteTable(
     index("rssFeedImports_feedIdIdx_idx").on(bl.rssFeedId),
     index("rssFeedImports_entryIdIdx_idx").on(bl.entryId),
     unique().on(bl.rssFeedId, bl.entryId),
+    index("rssFeedImports_bookmarkId_idx").on(bl.bookmarkId),
     // Composite index for RSS feed filter queries (when filtering by rssFeedId)
     index("rssFeedImports_rssFeedId_bookmarkId_idx").on(
       bl.rssFeedId,
@@ -956,6 +957,7 @@ export const importStagingBookmarks = sqliteTable(
       isb.status,
     ),
     index("importStaging_completedAt_idx").on(isb.completedAt),
+    index("importStaging_resultBookmarkId_idx").on(isb.resultBookmarkId),
     index("importStaging_status_idx").on(isb.status),
     index("importStaging_status_processingStartedAt_idx").on(
       isb.status,

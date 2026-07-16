@@ -187,7 +187,7 @@ type EventLogInternal =
       "subscription.status"?: string;
       "subscription.prev_tier"?: string;
       "subscription.prev_status"?: string;
-      "subscription.sync_skipped_reason"?: "unknown_customer";
+      "subscription.sync_skipped_reason"?: "unknown_customer" | "manual_tier";
       "subscription.cancel_at_period_end"?: boolean;
       "subscription.transition"?:
         | "upgrade"

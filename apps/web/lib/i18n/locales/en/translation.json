@@ -408,6 +408,10 @@
             "label": "Admin: jobs",
             "description": "Access background job controls."
           },
+          "subscriptions": {
+            "label": "Admin: subscriptions",
+            "description": "Manage user subscription tiers."
+          },
           "system": {
             "label": "Admin: system",
             "description": "Access system status and diagnostics."

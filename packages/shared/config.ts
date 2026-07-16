@@ -552,6 +552,9 @@ export const clientConfig = {
   chat: {
     enabled: serverConfig.chat.enabled,
   },
+  stripe: {
+    isConfigured: serverConfig.stripe.isConfigured,
+  },
   legal: {
     termsOfServiceUrl: serverConfig.legal.termsOfServiceUrl,
     privacyPolicyUrl: serverConfig.legal.privacyPolicyUrl,

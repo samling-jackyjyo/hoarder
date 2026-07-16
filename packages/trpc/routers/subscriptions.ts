@@ -11,6 +11,7 @@ import serverConfig from "@karakeep/shared/config";
 
 import {
   Context,
+  createAdminScopedProcedure,
   createEventLogMiddleware,
   publicProcedure,
   router,
@@ -130,6 +131,14 @@ export async function syncStripeDataToDatabase(
       "subscription.prev_status": prevStatus ?? undefined,
     });
 
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, existingSubscription.userId),
+      columns: {
+        manualTierName: true,
+      },
+    });
+    const manualTierName = user?.manualTierName ?? null;
+
     try {
       const subscriptionsList = await stripe.subscriptions.list({
         customer: customerId,
@@ -138,6 +147,14 @@ export async function syncStripeDataToDatabase(
       });
 
       if (subscriptionsList.data.length === 0) {
+        if (manualTierName) {
+          // The user's entitlements were granted manually (e.g. through a
+          // collaboration); don't downgrade them to the free tier.
+          addLogFields<"subscription.synced">({
+            "subscription.sync_skipped_reason": "manual_tier",
+          });
+          return;
+        }
         await db.transaction(async (trx) => {
           await trx
             .update(subscriptions)
@@ -219,6 +236,15 @@ export async function syncStripeDataToDatabase(
           : null,
       };
 
+      if (subData.tier === "free" && manualTierName) {
+        // The user's entitlements were granted manually (e.g. through a
+        // collaboration); don't downgrade them to the free tier.
+        addLogFields<"subscription.synced">({
+          "subscription.sync_skipped_reason": "manual_tier",
+        });
+        return;
+      }
+
       await db.transaction(async (trx) => {
         await trx
           .update(subscriptions)
@@ -226,7 +252,8 @@ export async function syncStripeDataToDatabase(
           .where(eq(subscriptions.stripeCustomerId, customerId));
 
         if (subData.status === "active" || subData.status === "trialing") {
-          // Enable paid tier quotas and browser crawling
+          // Enable paid tier quotas and browser crawling. A real subscription
+          // supersedes a manually granted tier, so clear it.
           await trx
             .update(users)
             .set({
@@ -234,6 +261,7 @@ export async function syncStripeDataToDatabase(
               storageQuota: serverConfig.quotas.paid.assetSizeBytes,
               browserCrawlingEnabled:
                 serverConfig.quotas.paid.browserCrawlingEnabled,
+              manualTierName: null,
             })
             .where(eq(users.id, existingSubscription.userId));
         } else {
@@ -299,16 +327,27 @@ async function processEvent(event: Stripe.Event, db: Context["db"]) {
 }
 
 const subscriptionsProcedure = createScopedAuthedProcedure("subscriptions");
+const adminSubscriptionsProcedure = createAdminScopedProcedure("subscriptions");
 
 export const subscriptionsRouter = router({
   getSubscriptionStatus: subscriptionsProcedure.query(async ({ ctx }) => {
-    const subscription = await ctx.db.query.subscriptions.findFirst({
-      where: eq(subscriptions.userId, ctx.user.id),
-    });
+    const [user, subscription] = await Promise.all([
+      ctx.db.query.users.findFirst({
+        where: eq(users.id, ctx.user.id),
+        columns: {
+          manualTierName: true,
+        },
+      }),
+      ctx.db.query.subscriptions.findFirst({
+        where: eq(subscriptions.userId, ctx.user.id),
+      }),
+    ]);
+    const manualTierName = user?.manualTierName ?? null;
 
     if (!subscription) {
       return {
-        tier: "free" as const,
+        tier: manualTierName ? ("custom" as const) : ("free" as const),
+        manualTierName,
         status: null,
         startDate: null,
         endDate: null,
@@ -318,7 +357,8 @@ export const subscriptionsRouter = router({
     }
 
     return {
-      tier: subscription.tier,
+      tier: manualTierName ? ("custom" as const) : subscription.tier,
+      manualTierName,
       status: subscription.status,
       startDate: subscription.startDate,
       endDate: subscription.endDate,
@@ -550,6 +590,90 @@ export const subscriptionsRouter = router({
       },
     };
   }),
+
+  // Grants a manually-managed tier (e.g. a collaboration with another
+  // company). While set, Stripe sync won't downgrade the user's entitlements;
+  // it's cleared automatically when the user gets an active Stripe
+  // subscription. Pass manualTierName: null to revoke the grant and restore
+  // the configured free-tier entitlements.
+  updateSubscriptionTier: adminSubscriptionsProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        manualTierName: z.string().trim().min(1).max(100).nullable(),
+        bookmarkQuota: z.number().int().min(0).nullable().optional(),
+        storageQuota: z.number().int().min(0).nullable().optional(),
+        browserCrawlingEnabled: z.boolean().nullable().optional(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.email, input.email),
+        columns: {
+          id: true,
+          emailVerified: true,
+        },
+        with: {
+          subscription: true,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      if (
+        input.manualTierName &&
+        serverConfig.auth.emailVerificationRequired &&
+        !user.emailVerified
+      ) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "User email is not verified",
+        });
+      }
+
+      if (
+        input.manualTierName &&
+        (user.subscription?.status === "active" ||
+          user.subscription?.status === "trialing")
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User already has an active Stripe subscription",
+        });
+      }
+
+      const updateData: Partial<typeof users.$inferInsert> =
+        input.manualTierName === null
+          ? {
+              manualTierName: null,
+              bookmarkQuota: serverConfig.quotas.free.bookmarkLimit,
+              storageQuota: serverConfig.quotas.free.assetSizeBytes,
+              browserCrawlingEnabled:
+                serverConfig.quotas.free.browserCrawlingEnabled,
+            }
+          : { manualTierName: input.manualTierName };
+
+      if (input.manualTierName !== null) {
+        if (input.bookmarkQuota !== undefined) {
+          updateData.bookmarkQuota = input.bookmarkQuota;
+        }
+
+        if (input.storageQuota !== undefined) {
+          updateData.storageQuota = input.storageQuota;
+        }
+
+        if (input.browserCrawlingEnabled !== undefined) {
+          updateData.browserCrawlingEnabled = input.browserCrawlingEnabled;
+        }
+      }
+
+      await ctx.db.update(users).set(updateData).where(eq(users.id, user.id));
+    }),
 
   handleWebhook: publicProcedure
     .use(createEventLogMiddleware("subscription.webhook_received"))

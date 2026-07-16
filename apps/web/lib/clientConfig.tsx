@@ -21,6 +21,9 @@ export const ClientConfigCtx = createContext<ClientConfig>({
   chat: {
     enabled: false,
   },
+  stripe: {
+    isConfigured: false,
+  },
   legal: {
     termsOfServiceUrl: undefined,
     privacyPolicyUrl: undefined,

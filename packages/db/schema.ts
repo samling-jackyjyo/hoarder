@@ -60,6 +60,10 @@ export const users = sqliteTable("user", {
   browserCrawlingEnabled: integer("browserCrawlingEnabled", {
     mode: "boolean",
   }),
+  // Admin-granted plan label (e.g. a collaborator name). While set, Stripe
+  // sync doesn't downgrade the user's entitlements; it's cleared when the
+  // user gets an active Stripe subscription.
+  manualTierName: text("manualTierName"),
 
   // User Settings
   bookmarkClickAction: text("bookmarkClickAction", {

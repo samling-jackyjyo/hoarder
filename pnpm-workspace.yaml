@@ -48,4 +48,6 @@ minimumReleaseAgeExclude:
 # 7.3.x were already in the lockfile before this PR; this just makes
 # 7.0.6 the workspace-wide resolution.
 overrides:
+  i18next-fs-backend: 2.6.6
+  shell-quote: 1.8.4
   vite: 7.0.6

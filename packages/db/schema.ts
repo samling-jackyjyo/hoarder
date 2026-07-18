@@ -246,7 +246,6 @@ export const bookmarks = sqliteTable(
     }),
   },
   (b) => [
-    index("bookmarks_userId_idx").on(b.userId),
     index("bookmarks_createdAt_idx").on(b.createdAt),
     // Composite indexes for optimized pagination queries
     index("bookmarks_userId_createdAt_id_idx").on(b.userId, b.createdAt, b.id),
@@ -462,7 +461,6 @@ export const bookmarkTags = sqliteTable(
     unique().on(bt.userId, bt.name),
     unique("bookmarkTags_userId_id_idx").on(bt.userId, bt.id),
     index("bookmarkTags_name_idx").on(bt.name),
-    index("bookmarkTags_userId_idx").on(bt.userId),
     index("bookmarkTags_normalizedName_idx").on(bt.normalizedName),
   ],
 );
@@ -484,8 +482,6 @@ export const tagsOnBookmarks = sqliteTable(
   },
   (tb) => [
     primaryKey({ columns: [tb.bookmarkId, tb.tagId] }),
-    index("tagsOnBookmarks_tagId_idx").on(tb.tagId),
-    index("tagsOnBookmarks_bookmarkId_idx").on(tb.bookmarkId),
     // Composite index for tag-first queries (when filtering by tagId)
     index("tagsOnBookmarks_tagId_bookmarkId_idx").on(tb.tagId, tb.bookmarkId),
   ],
@@ -545,8 +541,6 @@ export const bookmarksInLists = sqliteTable(
   },
   (tb) => [
     primaryKey({ columns: [tb.bookmarkId, tb.listId] }),
-    index("bookmarksInLists_bookmarkId_idx").on(tb.bookmarkId),
-    index("bookmarksInLists_listId_idx").on(tb.listId),
     // Composite index for list-first queries (when filtering by listId)
     index("bookmarksInLists_listId_bookmarkId_idx").on(
       tb.listId,
@@ -976,7 +970,6 @@ export const importSessionBookmarks = sqliteTable(
     createdAt: createdAtField(),
   },
   (isb) => [
-    index("importSessionBookmarks_sessionId_idx").on(isb.importSessionId),
     index("importSessionBookmarks_bookmarkId_idx").on(isb.bookmarkId),
     unique().on(isb.importSessionId, isb.bookmarkId),
   ],

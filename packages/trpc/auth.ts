@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from "crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import * as bcrypt from "bcryptjs";
 import { and, eq } from "drizzle-orm";
 
@@ -124,10 +124,14 @@ export async function authenticateApiKey(key: string, database: Context["db"]) {
     case 1:
       validation = await bcrypt.compare(keySecret, hash);
       break;
-    case 2:
+    case 2: {
+      const candidateHash = createHash("sha256").update(keySecret).digest();
+      const expectedHash = Buffer.from(hash, "base64");
       validation =
-        createHash("sha256").update(keySecret).digest("base64") == hash;
+        candidateHash.length === expectedHash.length &&
+        timingSafeEqual(candidateHash, expectedHash);
       break;
+    }
     default:
       throw new Error("Invalid API Key");
   }

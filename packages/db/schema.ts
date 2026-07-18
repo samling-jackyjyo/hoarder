@@ -928,17 +928,35 @@ export const importSessions = sqliteTable(
       onDelete: "set null",
     }),
     status: text("status", {
-      enum: ["staging", "pending", "running", "paused", "completed", "failed"],
+      enum: [
+        "staging",
+        "pending",
+        "running",
+        "paused",
+        "completed",
+        "failed",
+        "archived",
+      ],
     })
       .notNull()
       .default("staging"),
     lastProcessedAt: integer("lastProcessedAt", { mode: "timestamp" }),
+    completedAt: integer("completedAt", { mode: "timestamp" }),
+    totalBookmarks: integer("totalBookmarks").notNull().default(0),
+    completedBookmarks: integer("completedBookmarks").notNull().default(0),
+    failedBookmarks: integer("failedBookmarks").notNull().default(0),
+    pendingBookmarks: integer("pendingBookmarks").notNull().default(0),
+    processingBookmarks: integer("processingBookmarks").notNull().default(0),
     createdAt: createdAtField(),
     modifiedAt: modifiedAtField(),
   },
   (is) => [
     index("importSessions_userId_idx").on(is.userId),
     index("importSessions_status_idx").on(is.status),
+    index("importSessions_status_completedAt_idx").on(
+      is.status,
+      is.completedAt,
+    ),
   ],
 );
 

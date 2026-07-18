@@ -535,7 +535,8 @@
         "running": "Running",
         "paused": "Paused",
         "completed": "Completed",
-        "failed": "Failed"
+        "failed": "Failed",
+        "archived": "Archived"
       },
       "badges": {
         "pending": "{{count}} pending",
@@ -573,6 +574,7 @@
         "result_pending": "Pending",
         "result_processing": "Processing",
         "no_results": "No results found for this filter.",
+        "archived_results": "Individual bookmark results are no longer retained for archived import sessions.",
         "view_bookmark": "View Bookmark",
         "load_more": "Load More",
         "no_title": "No title"

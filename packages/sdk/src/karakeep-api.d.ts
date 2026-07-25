@@ -96,6 +96,26 @@ export interface paths {
     patch: operations["updateBookmark"];
     trace?: never;
   };
+  "/bookmarks/{bookmarkId}/content": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get readable bookmark content
+     * @description Retrieve a bounded chunk of an agent-readable bookmark representation. Link content is rendered from extracted HTML; text and media bookmarks use their stored or extracted text. Continue reading by passing the opaque `nextCursor` from the previous response.
+     */
+    get: operations["getBookmarkReadableContent"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/bookmarks/{bookmarkId}/summarize": {
     parameters: {
       query?: never;
@@ -919,6 +939,28 @@ export interface components {
       /** @description A human-readable error message. */
       message: string;
     };
+    BookmarkReadableContent: {
+      bookmarkId: string;
+      /** @enum {string} */
+      bookmarkType: "link" | "text" | "asset";
+      /** @enum {string} */
+      format: "markdown" | "text";
+      content: string;
+      /** @description A hash identifying the rendered content version used by this cursor. */
+      contentVersion: string;
+      range: {
+        /** @description Zero-based start offset in Unicode characters, inclusive. */
+        start: number;
+        /** @description Zero-based end offset in Unicode characters, exclusive. */
+        end: number;
+        /** @description Total number of Unicode characters in the rendered content. */
+        total: number;
+      };
+      /** @description Cursor for the next chunk, or null when all content has been returned. */
+      nextCursor: string | null;
+      /** @description Whether more readable content remains after this chunk. */
+      truncated: boolean;
+    };
     List: {
       id: string;
       name: string;
@@ -1415,6 +1457,72 @@ export interface operations {
       };
       /** @description Bookmark not found. */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  getBookmarkReadableContent: {
+    parameters: {
+      query?: {
+        /** @description The readable representation. If omitted with a cursor, the cursor's format is used; otherwise defaults to markdown. */
+        format?: "markdown" | "text";
+        /** @description Maximum number of Unicode characters to return. The chunk may end earlier at a paragraph or line boundary. */
+        maxChars?: number;
+        /** @description Opaque continuation cursor returned as `nextCursor` by a previous response. */
+        cursor?: string;
+      };
+      header?: never;
+      path: {
+        /** @description The unique identifier of the bookmark. */
+        bookmarkId: components["parameters"]["BookmarkId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description A bounded chunk of readable bookmark content. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookmarkReadableContent"];
+        };
+      };
+      /** @description Bad request — the cursor is malformed, mismatched, or outside the content. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Unauthorized — the Bearer token is missing, invalid, or expired. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/plain": string;
+        };
+      };
+      /** @description Bookmark not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description The bookmark content changed after the supplied cursor was issued. */
+      409: {
         headers: {
           [name: string]: unknown;
         };

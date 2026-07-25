@@ -2,9 +2,13 @@ import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import * as z from "zod";
 
 import {
+  BookmarkTypes,
+  DEFAULT_READABLE_CONTENT_MAX_CHARS,
+  MAX_READABLE_CONTENT_MAX_CHARS,
   zAssetSchema,
   zAssetTypesSchema,
   zBareBookmarkSchema,
+  zBookmarkReadableContentFormatSchema,
   zManipulatedTagSchema,
   zNewBookmarkRequestSchema,
   zSortOrder,
@@ -222,6 +226,129 @@ registry.registerPath({
       },
     },
     401: UnauthorizedResponse,
+    404: {
+      description: "Bookmark not found.",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
+  operationId: "getBookmarkReadableContent",
+  method: "get",
+  path: "/bookmarks/{bookmarkId}/content",
+  description:
+    "Retrieve a bounded chunk of an agent-readable bookmark representation. " +
+    "Link content is rendered from extracted HTML; text and media bookmarks use their stored or extracted text. " +
+    "Continue reading by passing the opaque `nextCursor` from the previous response.",
+  summary: "Get readable bookmark content",
+  tags: ["Bookmarks"],
+  security: [{ [BearerAuth.name]: [] }],
+  request: {
+    params: z.object({ bookmarkId: BookmarkIdSchema }),
+    query: z.object({
+      format: zBookmarkReadableContentFormatSchema
+        .optional()
+        .describe(
+          "The readable representation. If omitted with a cursor, the cursor's format is used; otherwise defaults to markdown.",
+        ),
+      maxChars: z
+        .number()
+        .int()
+        .min(1)
+        .max(MAX_READABLE_CONTENT_MAX_CHARS)
+        .optional()
+        .default(DEFAULT_READABLE_CONTENT_MAX_CHARS)
+        .describe(
+          "Maximum number of Unicode characters to return. The chunk may end earlier at a paragraph or line boundary.",
+        ),
+      cursor: z
+        .string()
+        .optional()
+        .describe(
+          "Opaque continuation cursor returned as `nextCursor` by a previous response.",
+        ),
+    }),
+  },
+  responses: {
+    200: {
+      description: "A bounded chunk of readable bookmark content.",
+      content: {
+        "application/json": {
+          schema: z
+            .object({
+              bookmarkId: z.string(),
+              bookmarkType: z.enum([
+                BookmarkTypes.LINK,
+                BookmarkTypes.TEXT,
+                BookmarkTypes.ASSET,
+              ]),
+              format: zBookmarkReadableContentFormatSchema,
+              content: z.string(),
+              contentVersion: z
+                .string()
+                .describe(
+                  "A hash identifying the rendered content version used by this cursor.",
+                ),
+              range: z.object({
+                start: z
+                  .number()
+                  .int()
+                  .describe(
+                    "Zero-based start offset in Unicode characters, inclusive.",
+                  ),
+                end: z
+                  .number()
+                  .int()
+                  .describe(
+                    "Zero-based end offset in Unicode characters, exclusive.",
+                  ),
+                total: z
+                  .number()
+                  .int()
+                  .describe(
+                    "Total number of Unicode characters in the rendered content.",
+                  ),
+              }),
+              nextCursor: z
+                .string()
+                .nullable()
+                .describe(
+                  "Cursor for the next chunk, or null when all content has been returned.",
+                ),
+              truncated: z
+                .boolean()
+                .describe(
+                  "Whether more readable content remains after this chunk.",
+                ),
+            })
+            .openapi("BookmarkReadableContent"),
+        },
+      },
+    },
+    400: {
+      description:
+        "Bad request — the cursor is malformed, mismatched, or outside the content.",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+    401: UnauthorizedResponse,
+    409: {
+      description:
+        "The bookmark content changed after the supplied cursor was issued.",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
     404: {
       description: "Bookmark not found.",
       content: {

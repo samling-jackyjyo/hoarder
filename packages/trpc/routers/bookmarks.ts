@@ -41,6 +41,8 @@ import {
   BookmarkTypes,
   DEFAULT_NUM_BOOKMARKS_PER_PAGE,
   zBookmarkSchema,
+  zBookmarkReadableContentFormatSchema,
+  zBookmarkReadableContentSchema,
   zGetBookmarksRequestSchema,
   zGetBookmarksResponseSchema,
   zManipulatedTagSchema,
@@ -812,6 +814,21 @@ export const bookmarksAppRouter = router({
       return (
         await Bookmark.fromId(ctx, input.bookmarkId, input.includeContent)
       ).asZBookmark();
+    }),
+  getBookmarkReadableContent: bookmarksProcedure
+    .use(createBookmarksQueriedMiddleware())
+    .input(
+      z.object({
+        bookmarkId: z.string(),
+        format: zBookmarkReadableContentFormatSchema.default("markdown"),
+      }),
+    )
+    .output(zBookmarkReadableContentSchema)
+    .use(ensureBookmarkAccess)
+    .query(async ({ input, ctx }) => {
+      return (
+        await Bookmark.fromId(ctx, input.bookmarkId, /* includeContent: */ true)
+      ).asReadableContent(input.format);
     }),
   searchBookmarks: bookmarksProcedure
     .use(createBookmarksQueriedMiddleware())

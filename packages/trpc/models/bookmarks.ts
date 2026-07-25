@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { TRPCError } from "@trpc/server";
 import {
   and,
@@ -14,6 +16,7 @@ import {
   SQL,
 } from "drizzle-orm";
 import invariant from "tiny-invariant";
+import TurndownService from "turndown";
 import { z } from "zod";
 
 import { db as DONT_USE_db } from "@karakeep/db";
@@ -37,13 +40,17 @@ import { getAlignedExpiry } from "@karakeep/shared/signedTokens";
 import {
   BookmarkTypes,
   DEFAULT_NUM_BOOKMARKS_PER_PAGE,
+  zGetBookmarksRequestSchema,
+} from "@karakeep/shared/types/bookmarks";
+import type {
   ZBareBookmark,
   ZBookmark,
   ZBookmarkContent,
-  zGetBookmarksRequestSchema,
+  ZBookmarkReadableContent,
+  ZBookmarkReadableContentFormat,
   ZPublicBookmark,
 } from "@karakeep/shared/types/bookmarks";
-import { ZCursor } from "@karakeep/shared/types/pagination";
+import type { ZCursor } from "@karakeep/shared/types/pagination";
 import {
   getBookmarkLinkAssetIdOrUrl,
   getBookmarkTitle,
@@ -78,6 +85,11 @@ async function dummyDrizzleReturnType() {
 type BookmarkQueryReturnType = Awaited<
   ReturnType<typeof dummyDrizzleReturnType>
 >;
+
+const turndownService = new TurndownService({
+  bulletListMarker: "-",
+  headingStyle: "atx",
+});
 
 export class BareBookmark {
   protected constructor(
@@ -763,6 +775,48 @@ export class Bookmark extends BareBookmark {
       archived: false,
       favourited: false,
       note: null,
+    };
+  }
+
+  asReadableContent(
+    format: ZBookmarkReadableContentFormat,
+  ): ZBookmarkReadableContent {
+    let content: string;
+    switch (this.bookmark.content.type) {
+      case BookmarkTypes.LINK: {
+        const htmlContent = this.bookmark.content.htmlContent ?? "";
+        content =
+          format === "markdown"
+            ? turndownService.turndown(htmlContent)
+            : htmlToPlainText(htmlContent);
+        break;
+      }
+      case BookmarkTypes.TEXT:
+        content = this.bookmark.content.text;
+        break;
+      case BookmarkTypes.ASSET:
+        content = this.bookmark.content.content ?? "";
+        break;
+      default:
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Bookmark has an unknown content type",
+        });
+    }
+
+    content = content.replace(/\r\n?/g, "\n").trim();
+    const contentVersion = `sha256:${createHash("sha256")
+      .update(format)
+      .update("\0")
+      .update(content)
+      .digest("hex")}`;
+
+    return {
+      bookmarkId: this.bookmark.id,
+      bookmarkType: this.bookmark.content.type,
+      format,
+      content,
+      contentVersion,
     };
   }
 

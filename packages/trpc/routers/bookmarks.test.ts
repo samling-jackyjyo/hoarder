@@ -74,6 +74,44 @@ describe("Bookmark Routes", () => {
     expect(res.content.type).toEqual(BookmarkTypes.LINK);
   });
 
+  test<CustomTestContext>("get readable bookmark content as markdown or text", async ({
+    apiCallers,
+    db,
+  }) => {
+    const api = apiCallers[0].bookmarks;
+    const bookmark = await api.createBookmark({
+      url: "https://example.com/article",
+      type: BookmarkTypes.LINK,
+    });
+    await db
+      .update(bookmarkLinks)
+      .set({
+        htmlContent:
+          '<h1>Hello</h1><p>Read <a href="https://example.com/docs">the docs</a>.</p>',
+      })
+      .where(eq(bookmarkLinks.id, bookmark.id));
+
+    const markdown = await api.getBookmarkReadableContent({
+      bookmarkId: bookmark.id,
+      format: "markdown",
+    });
+    expect(markdown).toMatchObject({
+      bookmarkId: bookmark.id,
+      bookmarkType: BookmarkTypes.LINK,
+      format: "markdown",
+      content: "# Hello\n\nRead [the docs](https://example.com/docs).",
+    });
+    expect(markdown.contentVersion).toMatch(/^sha256:[a-f0-9]{64}$/);
+
+    const text = await api.getBookmarkReadableContent({
+      bookmarkId: bookmark.id,
+      format: "text",
+    });
+    expect(text.content).toContain("HELLO");
+    expect(text.content).toContain("Read the docs");
+    expect(text.contentVersion).not.toBe(markdown.contentVersion);
+  });
+
   test<CustomTestContext>("api key with read scope can read bookmarks but not write", async ({
     apiCallers,
     db,
@@ -91,6 +129,12 @@ describe("Bookmark Routes", () => {
 
     const bookmarks = await apiKeyCaller.bookmarks.getBookmarks({});
     expect(bookmarks.bookmarks).toHaveLength(1);
+    await expect(
+      apiKeyCaller.bookmarks.getBookmarkReadableContent({
+        bookmarkId: bookmarks.bookmarks[0].id,
+        format: "markdown",
+      }),
+    ).resolves.toMatchObject({ content: "seed bookmark" });
 
     await expect(() =>
       apiKeyCaller.bookmarks.createBookmark({

@@ -19,7 +19,11 @@ vi.mock("./shared", () => ({
   turndownService: mockTurndown,
 }));
 
-import { deleteBookmarkHandler, getBookmarkContentHandler } from "./bookmarks";
+import {
+  deleteBookmarkHandler,
+  getBookmarkContentHandler,
+  getBookmarkListsHandler,
+} from "./bookmarks";
 
 const textOf = (result: CallToolResult): string => {
   const first = result.content[0];
@@ -74,6 +78,56 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.clearAllMocks();
+});
+
+describe("get-bookmark-lists", () => {
+  it("returns every list containing the bookmark", async () => {
+    mockClient.GET.mockResolvedValueOnce({
+      data: {
+        lists: [
+          {
+            id: "list_1",
+            name: "Reading",
+            icon: "📚",
+            type: "manual",
+            description: null,
+            parentId: null,
+            query: null,
+            public: false,
+            hasCollaborators: false,
+            userRole: "owner",
+          },
+        ],
+      },
+      error: undefined,
+    });
+
+    const result = await getBookmarkListsHandler({
+      bookmarkId: "bookmark_1",
+    });
+
+    expect(mockClient.GET).toHaveBeenCalledWith(
+      "/bookmarks/{bookmarkId}/lists",
+      {
+        params: { path: { bookmarkId: "bookmark_1" } },
+      },
+    );
+    expect(textOf(result)).toContain("List ID: list_1");
+    expect(textOf(result)).toContain("Name: Reading");
+  });
+
+  it("reports when the bookmark is not in a list", async () => {
+    mockClient.GET.mockResolvedValueOnce({
+      data: { lists: [] },
+      error: undefined,
+    });
+
+    const result = await getBookmarkListsHandler({
+      bookmarkId: "bookmark_1",
+    });
+
+    expect(textOf(result)).toBe("This bookmark is not in any lists.");
+  });
 });
 
 describe("delete-bookmark", () => {

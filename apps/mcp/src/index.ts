@@ -5,6 +5,7 @@ import { mcpServer } from "./shared";
 
 import "./assets.ts";
 import "./bookmarks.ts";
+import "./highlights.ts";
 import "./lists.ts";
 import "./tags.ts";
 

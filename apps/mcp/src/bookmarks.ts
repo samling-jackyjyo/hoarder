@@ -2,7 +2,7 @@ import { CallToolResult } from "@modelcontextprotocol/sdk/types";
 import { z } from "zod";
 
 import { karakeepClient, mcpServer, turndownService } from "./shared";
-import { compactBookmark, toMcpToolError } from "./utils";
+import { compactBookmark, compactList, toMcpToolError } from "./utils";
 
 // Tools
 mcpServer.tool(
@@ -40,8 +40,12 @@ machine learning is:fav`),
       .describe(
         `The next cursor to use for pagination. The value for this is returned from a previous call to this tool.`,
       ),
+    sortOrder: z
+      .enum(["asc", "desc", "relevance"])
+      .optional()
+      .describe(`Sort by relevance or creation date. Defaults to relevance.`),
   },
-  async ({ query, limit, nextCursor }): Promise<CallToolResult> => {
+  async ({ query, limit, nextCursor, sortOrder }): Promise<CallToolResult> => {
     const res = await karakeepClient.GET("/bookmarks/search", {
       params: {
         query: {
@@ -49,6 +53,7 @@ machine learning is:fav`),
           limit: limit,
           includeContent: false,
           cursor: nextCursor,
+          sortOrder,
         },
       },
     });
@@ -99,6 +104,45 @@ mcpServer.tool(
       ],
     };
   },
+);
+
+export const getBookmarkListsInputSchema = {
+  bookmarkId: z
+    .string()
+    .min(1)
+    .describe(`The id of the bookmark whose lists to retrieve.`),
+};
+
+export async function getBookmarkListsHandler({
+  bookmarkId,
+}: {
+  bookmarkId: string;
+}): Promise<CallToolResult> {
+  const res = await karakeepClient.GET("/bookmarks/{bookmarkId}/lists", {
+    params: { path: { bookmarkId } },
+  });
+  if (!res.data) {
+    return toMcpToolError(res.error);
+  }
+  return {
+    content: [
+      {
+        type: "text",
+        text:
+          res.data.lists.length > 0
+            ? res.data.lists.map(compactList).join("\n\n")
+            : "This bookmark is not in any lists.",
+      },
+    ],
+  };
+}
+
+mcpServer.tool(
+  "get-bookmark-lists",
+  `List every list that contains a bookmark.`,
+  getBookmarkListsInputSchema,
+  { readOnlyHint: true },
+  getBookmarkListsHandler,
 );
 
 mcpServer.tool(

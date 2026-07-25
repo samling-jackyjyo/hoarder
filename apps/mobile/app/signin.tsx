@@ -22,6 +22,23 @@ enum LoginType {
 }
 
 const DEFAULT_SERVER_ADDRESS = "https://cloud.karakeep.app";
+const CONNECTION_ERROR_MESSAGE =
+  "Couldn’t connect to this Karakeep server. Check the server address and your internet connection, then try again.";
+
+function getLoginErrorMessage(
+  error: { data?: { code?: string } | null; message: string },
+  unauthorizedMessage: string,
+) {
+  if (error.data?.code === "UNAUTHORIZED") {
+    return unauthorizedMessage;
+  }
+
+  if (error.message.toLowerCase().includes("fetch failed")) {
+    return CONNECTION_ERROR_MESSAGE;
+  }
+
+  return error.message;
+}
 
 // The logo artboard is 598x166; derive the width so it never letterboxes.
 const LOGO_HEIGHT = 52;
@@ -67,11 +84,7 @@ export default function Signin() {
           setSettings({ ...settings, apiKey: resp.key, apiKeyId: resp.id });
         },
         onError: (e) => {
-          if (e.data?.code === "UNAUTHORIZED") {
-            setError("Wrong username or password");
-          } else {
-            setError(`${e.message}`);
-          }
+          setError(getLoginErrorMessage(e, "Wrong username or password"));
         },
       }),
     );
@@ -84,11 +97,7 @@ export default function Signin() {
           setSettings({ ...settings, apiKey: apiKey });
         },
         onError: (e) => {
-          if (e.data?.code === "UNAUTHORIZED") {
-            setError("Invalid API key");
-          } else {
-            setError(`${e.message}`);
-          }
+          setError(getLoginErrorMessage(e, "Invalid API key"));
         },
       }),
     );
@@ -120,6 +129,8 @@ export default function Signin() {
       setError("Server address must start with http:// or https://");
       return;
     }
+
+    setError(undefined);
 
     if (loginType === LoginType.Password) {
       const email = emailRef.current;

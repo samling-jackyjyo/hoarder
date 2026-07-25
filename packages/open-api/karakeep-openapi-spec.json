@@ -667,6 +667,30 @@
           "fileName"
         ]
       },
+      "SignedAssetUrl": {
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string",
+            "description": "The unique identifier of the asset."
+          },
+          "signedUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "The temporary URL for downloading the asset."
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the signed URL expires, in ISO 8601 format."
+          }
+        },
+        "required": [
+          "assetId",
+          "signedUrl",
+          "expiresAt"
+        ]
+      },
       "Feed": {
         "type": "object",
         "properties": {
@@ -3973,6 +3997,49 @@
         "responses": {
           "200": {
             "description": "The asset's binary content. The Content-Type header reflects the asset's MIME type (e.g., image/png, application/pdf)."
+          },
+          "401": {
+            "description": "Unauthorized — the Bearer token is missing, invalid, or expired.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{assetId}/signed-url": {
+      "get": {
+        "operationId": "getAssetSignedUrl",
+        "description": "Generate a temporary signed URL that can be used to download an asset without sending an API key.",
+        "summary": "Get a signed asset URL",
+        "tags": [
+          "Assets"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssetId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A temporary signed URL for downloading the asset and its expiration time.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedAssetUrl"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized — the Bearer token is missing, invalid, or expired.",

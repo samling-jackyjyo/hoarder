@@ -28,6 +28,9 @@ with Karakeep from other tools.
 - Listing the bookmarks attached to a tag (`get-tag-bookmarks`)
 - Attaching and detaching tags on bookmarks (`attach-tag-to-bookmark`, `detach-tag-from-bookmark`)
 
+**Assets**
+- Getting a temporary signed download URL for an asset (`get-asset`)
+
 Currently, the MCP server only exposes tools (no resources).
 
 ## Usage with Claude Desktop

@@ -19,6 +19,7 @@ import { useColorScheme } from "nativewind";
 
 import { useTRPC } from "@karakeep/shared-react/trpc";
 import { BookmarkTypes } from "@karakeep/shared/types/bookmarks";
+import { getBookmarkRefreshInterval } from "@karakeep/shared/utils/bookmarkUtils";
 
 function KeepScreenOn() {
   useKeepAwake();
@@ -48,10 +49,19 @@ export default function BookmarkView() {
     error,
     refetch,
   } = useQuery(
-    api.bookmarks.getBookmark.queryOptions({
-      bookmarkId: slug,
-      includeContent: false,
-    }),
+    api.bookmarks.getBookmark.queryOptions(
+      {
+        bookmarkId: slug,
+        includeContent: false,
+      },
+      {
+        refetchInterval: (query) => {
+          const data = query.state.data;
+          if (!data) return false;
+          return getBookmarkRefreshInterval(data);
+        },
+      },
+    ),
   );
 
   if (error) {

@@ -595,7 +595,7 @@ export interface paths {
     put?: never;
     /**
      * Trigger recrawl of links (admin)
-     * @description Trigger a recrawl of link bookmarks. You can filter by crawl status to target specific bookmarks (e.g., only failed ones). Optionally run AI inference after crawling. Requires admin role.
+     * @description Trigger a recrawl of link bookmarks. You can filter by crawl status to target specific bookmarks (e.g., only failed ones) and by how recently they were modified. Optionally run AI inference after crawling. Requires admin role.
      */
     post: operations["adminTriggerRecrawl"];
     delete?: never;
@@ -615,7 +615,7 @@ export interface paths {
     put?: never;
     /**
      * Trigger reindex of all bookmarks (admin)
-     * @description Trigger a reindex of all bookmarks in the search engine. This clears the existing index and re-queues all bookmarks for indexing. Requires admin role.
+     * @description Trigger a reindex of bookmarks in the search engine. Without modifiedWithinSeconds, this clears the existing index and re-queues all bookmarks. When set, only bookmarks modified within that many seconds are re-queued and the existing index is preserved. Requires admin role.
      */
     post: operations["adminTriggerReindex"];
     delete?: never;
@@ -635,7 +635,7 @@ export interface paths {
     put?: never;
     /**
      * Trigger AI inference on bookmarks (admin)
-     * @description Trigger AI inference (tagging or summarization) on bookmarks. You can filter by status to target specific bookmarks (e.g., only failed ones). Requires admin role.
+     * @description Trigger AI inference (tagging or summarization) on bookmarks. You can filter by status and by how recently bookmarks were modified. Requires admin role.
      */
     post: operations["adminTriggerInference"];
     delete?: never;
@@ -3140,6 +3140,8 @@ export interface operations {
            * @default false
            */
           runInference?: boolean;
+          /** @description Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks. */
+          modifiedWithinSeconds?: number;
         };
       };
     };
@@ -3192,7 +3194,15 @@ export interface operations {
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    /** @description Optional time window for the reindex job. */
+    requestBody?: {
+      content: {
+        "application/json": {
+          /** @description Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks. */
+          modifiedWithinSeconds?: number;
+        };
+      };
+    };
     responses: {
       /** @description Reindex jobs triggered successfully. */
       200: {
@@ -3248,6 +3258,8 @@ export interface operations {
            * @enum {string}
            */
           status?: "success" | "failure" | "pending" | "all";
+          /** @description Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks. */
+          modifiedWithinSeconds?: number;
         };
       };
     };

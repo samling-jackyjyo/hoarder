@@ -4384,7 +4384,7 @@
     "/admin/jobs/trigger/recrawl": {
       "post": {
         "operationId": "adminTriggerRecrawl",
-        "description": "Trigger a recrawl of link bookmarks. You can filter by crawl status to target specific bookmarks (e.g., only failed ones). Optionally run AI inference after crawling. Requires admin role.",
+        "description": "Trigger a recrawl of link bookmarks. You can filter by crawl status to target specific bookmarks (e.g., only failed ones) and by how recently they were modified. Optionally run AI inference after crawling. Requires admin role.",
         "summary": "Trigger recrawl of links (admin)",
         "tags": [
           "Admin"
@@ -4416,11 +4416,18 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Whether to run AI inference after crawling."
+                  },
+                  "modifiedWithinSeconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks."
                   }
                 },
                 "example": {
                   "crawlStatus": "failure",
-                  "runInference": false
+                  "runInference": false,
+                  "modifiedWithinSeconds": 3600
                 }
               }
             }
@@ -4483,7 +4490,7 @@
     "/admin/jobs/trigger/reindex": {
       "post": {
         "operationId": "adminTriggerReindex",
-        "description": "Trigger a reindex of all bookmarks in the search engine. This clears the existing index and re-queues all bookmarks for indexing. Requires admin role.",
+        "description": "Trigger a reindex of bookmarks in the search engine. Without modifiedWithinSeconds, this clears the existing index and re-queues all bookmarks. When set, only bookmarks modified within that many seconds are re-queued and the existing index is preserved. Requires admin role.",
         "summary": "Trigger reindex of all bookmarks (admin)",
         "tags": [
           "Admin"
@@ -4493,6 +4500,27 @@
             "bearerAuth": []
           }
         ],
+        "requestBody": {
+          "description": "Optional time window for the reindex job.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "modifiedWithinSeconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks."
+                  }
+                },
+                "example": {
+                  "modifiedWithinSeconds": 3600
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Reindex jobs triggered successfully.",
@@ -4540,7 +4568,7 @@
     "/admin/jobs/trigger/inference": {
       "post": {
         "operationId": "adminTriggerInference",
-        "description": "Trigger AI inference (tagging or summarization) on bookmarks. You can filter by status to target specific bookmarks (e.g., only failed ones). Requires admin role.",
+        "description": "Trigger AI inference (tagging or summarization) on bookmarks. You can filter by status and by how recently bookmarks were modified. Requires admin role.",
         "summary": "Trigger AI inference on bookmarks (admin)",
         "tags": [
           "Admin"
@@ -4576,6 +4604,12 @@
                     ],
                     "default": "all",
                     "description": "Filter bookmarks by their inference status. Use 'failure' to retry only failed ones."
+                  },
+                  "modifiedWithinSeconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "description": "Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks."
                   }
                 },
                 "required": [
@@ -4583,7 +4617,8 @@
                 ],
                 "example": {
                   "type": "tag",
-                  "status": "failure"
+                  "status": "failure",
+                  "modifiedWithinSeconds": 3600
                 }
               }
             }

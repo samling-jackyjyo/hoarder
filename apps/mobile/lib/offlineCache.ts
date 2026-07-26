@@ -3,6 +3,7 @@ import type {
   PersistedClient,
   Persister,
 } from "@tanstack/react-query-persist-client";
+import { useSyncExternalStore } from "react";
 import {
   defaultShouldDehydrateQuery,
   onlineManager,
@@ -244,6 +245,25 @@ export const queryPersister: Persister = {
 
 export function clearPersistedCache() {
   discardPersistedCache();
+}
+
+function subscribeToPersistedCache(onStoreChange: () => void) {
+  const listener = queryCacheStorage.addOnValueChangedListener(() => {
+    onStoreChange();
+  });
+  return () => listener.remove();
+}
+
+function getPersistedCacheSize() {
+  return queryCacheStorage.byteSize;
+}
+
+export function usePersistedCacheSize() {
+  return useSyncExternalStore(
+    subscribeToPersistedCache,
+    getPersistedCacheSize,
+    getPersistedCacheSize,
+  );
 }
 
 export function setupCachePersistence() {

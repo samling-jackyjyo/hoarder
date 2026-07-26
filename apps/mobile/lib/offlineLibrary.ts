@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { createMMKV, useMMKVString } from "react-native-mmkv";
 import superjson from "superjson";
 import { z } from "zod";
@@ -333,6 +333,25 @@ export function removeAllOfflineArticles(scope: string) {
 
 export function clearOfflineLibrary() {
   offlineLibraryStorage.clearAll();
+}
+
+function subscribeToOfflineLibrary(onStoreChange: () => void) {
+  const listener = offlineLibraryStorage.addOnValueChangedListener(() => {
+    onStoreChange();
+  });
+  return () => listener.remove();
+}
+
+function getOfflineLibrarySize() {
+  return offlineLibraryStorage.byteSize;
+}
+
+export function useOfflineLibrarySize() {
+  return useSyncExternalStore(
+    subscribeToOfflineLibrary,
+    getOfflineLibrarySize,
+    getOfflineLibrarySize,
+  );
 }
 
 export function reconcileOfflineLibrary(scope: string) {

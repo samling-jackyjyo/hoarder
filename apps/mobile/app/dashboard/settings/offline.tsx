@@ -6,19 +6,53 @@ import EmptyState from "@/components/ui/EmptyState";
 import { Divider } from "@/components/ui/Divider";
 import { Text } from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast";
-import { clearPersistedCache } from "@/lib/offlineCache";
+import { clearPersistedCache, usePersistedCacheSize } from "@/lib/offlineCache";
 import {
   getOfflineLibraryScope,
   reconcileOfflineLibrary,
   removeAllOfflineArticles,
   removeOfflineArticle,
   useOfflineLibrary,
+  useOfflineLibrarySize,
 } from "@/lib/offlineLibrary";
 import useAppSettings from "@/lib/settings";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { BookOpen, Trash2 } from "lucide-react-native";
+
+const storageSizeFormatter = new Intl.NumberFormat(undefined, {
+  maximumFractionDigits: 1,
+});
+
+function formatStorageSize(bytes: number) {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  const units = ["KB", "MB", "GB"];
+  let value = bytes / 1024;
+  let unitIndex = 0;
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+
+  return `${storageSizeFormatter.format(value)} ${units[unitIndex]}`;
+}
+
+function CacheSectionHeader({ title, size }: { title: string; size: number }) {
+  return (
+    <View className="flex-row items-center justify-between px-1 pb-2">
+      <Text className="text-xs uppercase tracking-wide text-muted-foreground">
+        {title}
+      </Text>
+      <Text className="text-xs tabular-nums text-muted-foreground">
+        {formatStorageSize(size)}
+      </Text>
+    </View>
+  );
+}
 
 export default function OfflineContent() {
   const router = useRouter();
@@ -29,6 +63,8 @@ export default function OfflineContent() {
   const { colors } = useColorScheme();
   const scope = getOfflineLibraryScope(settings);
   const offlineLibrary = useOfflineLibrary(scope);
+  const offlineLibrarySize = useOfflineLibrarySize();
+  const recentCacheSize = usePersistedCacheSize();
 
   useEffect(() => {
     reconcileOfflineLibrary(scope);
@@ -96,6 +132,11 @@ export default function OfflineContent() {
         only as you browse and can be cleared at any time.
       </Text>
 
+      <CacheSectionHeader
+        title="Saved offline content"
+        size={offlineLibrarySize}
+      />
+
       {offlineLibrary.length === 0 ? (
         <EmptyState
           icon={BookOpen}
@@ -162,9 +203,7 @@ export default function OfflineContent() {
       )}
 
       <View className="mt-8">
-        <Text className="px-1 pb-2 text-xs uppercase tracking-wide text-muted-foreground">
-          Recent cache
-        </Text>
+        <CacheSectionHeader title="Recent cache" size={recentCacheSize} />
         <Pressable
           className="rounded-xl bg-card px-4 py-3"
           onPress={confirmClearRecentCache}

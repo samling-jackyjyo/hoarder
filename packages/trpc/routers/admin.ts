@@ -660,38 +660,45 @@ export const adminAppRouter = router({
         error?: string;
       } = { configured: false, connected: false };
 
-      const searchClient = await getSearchClient();
-      searchEngineStatus.configured = searchClient !== null;
-
-      if (searchClient) {
-        const pluginName = PluginManager.getPluginName(PluginType.Search);
-        if (pluginName) {
-          searchEngineStatus.pluginName = pluginName;
-        }
-        try {
+      // Resolving a client can itself throw (the provider connects lazily on
+      // first use), so it has to be inside the try as well -- otherwise one
+      // unreachable backend takes down this whole endpoint instead of just
+      // reporting itself as disconnected.
+      const searchPluginName = PluginManager.getPluginName(PluginType.Search);
+      if (searchPluginName) {
+        searchEngineStatus.pluginName = searchPluginName;
+      }
+      try {
+        const searchClient = await getSearchClient();
+        searchEngineStatus.configured = searchClient !== null;
+        if (searchClient) {
           await searchClient.search({ query: "", limit: 1 });
           searchEngineStatus.connected = true;
-        } catch (error) {
-          searchEngineStatus.error =
-            error instanceof Error ? error.message : "Unknown error";
         }
+      } catch (error) {
+        // A provider is registered (that's the only way getClient can throw),
+        // so it is configured -- it just can't be reached right now.
+        searchEngineStatus.configured = true;
+        searchEngineStatus.error =
+          error instanceof Error ? error.message : "Unknown error";
       }
 
-      const vectorStoreClient = await getVectorStoreClient();
-      vectorStoreStatus.configured = vectorStoreClient !== null;
-
-      if (vectorStoreClient) {
-        const pluginName = PluginManager.getPluginName(PluginType.VectorStore);
-        if (pluginName) {
-          vectorStoreStatus.pluginName = pluginName;
-        }
-
-        try {
+      const vectorStorePluginName = PluginManager.getPluginName(
+        PluginType.VectorStore,
+      );
+      if (vectorStorePluginName) {
+        vectorStoreStatus.pluginName = vectorStorePluginName;
+      }
+      try {
+        const vectorStoreClient = await getVectorStoreClient();
+        vectorStoreStatus.configured = vectorStoreClient !== null;
+        if (vectorStoreClient) {
           vectorStoreStatus.connected = await vectorStoreClient.getHealth();
-        } catch (error) {
-          vectorStoreStatus.error =
-            error instanceof Error ? error.message : "Unknown error";
         }
+      } catch (error) {
+        vectorStoreStatus.configured = true;
+        vectorStoreStatus.error =
+          error instanceof Error ? error.message : "Unknown error";
       }
 
       browserStatus.configured =

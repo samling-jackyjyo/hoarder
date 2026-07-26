@@ -24,6 +24,17 @@ export function makeMobileQueryClient() {
         staleTime: 60_000,
         gcTime: CACHE_MAX_AGE,
       },
+      mutations: {
+        // Now that onlineManager reports the real connectivity state, the
+        // default "online" mode would *pause* mutations fired while offline:
+        // onError never runs, isPending stays true forever, and because
+        // shouldDehydrateMutation is false they aren't persisted either -- so
+        // the write is silently lost on app kill with the UI still showing it
+        // as succeeded. Fail fast instead, so the existing onError handlers
+        // surface a toast. Revisit if we ever implement real offline queuing
+        // (persisted mutations + setMutationDefaults + resumePausedMutations).
+        networkMode: "always",
+      },
     },
   });
 }

@@ -230,6 +230,7 @@ export function BookmarkLinkReaderPreview({
       <BookmarkHtmlHighlighterDom
         htmlContent={displayedBookmarkWithContent.content.htmlContent ?? ""}
         contentStyle={contentStyle}
+        isDark={isDark}
         highlights={highlights?.highlights ?? []}
         readingProgressOffset={readingProgressOffset}
         readingProgressAnchor={readingProgressAnchor}

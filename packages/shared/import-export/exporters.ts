@@ -120,8 +120,11 @@ export function toNetscapeFormat(bookmarks: ZBookmark[]): string {
         ? `ADD_DATE="${Math.floor(bookmark.createdAt.getTime() / 1000)}"`
         : "";
 
+      // Tag names are attacker-influenced (the AI tagger writes them straight
+      // from model output), so they have to be escaped like any other value
+      // interpolated into an attribute.
       const tagNames = bookmark.tags.map((t) => t.name).join(",");
-      const tags = tagNames.length > 0 ? `TAGS="${tagNames}"` : "";
+      const tags = tagNames.length > 0 ? `TAGS="${escapeHtml(tagNames)}"` : "";
 
       const encodedUrl = escapeHtml(encodeURI(bookmark.content.url));
       const displayTitle = bookmark.title ?? bookmark.content.url;

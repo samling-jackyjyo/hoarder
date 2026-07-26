@@ -10,12 +10,14 @@ interface BookmarkSearchResultsProps {
   isInputFocused: boolean;
   state: BookmarkSearchState;
   onSelectHistory: (term: string) => void;
+  header?: React.ReactElement;
 }
 
 export default function BookmarkSearchResults({
   rawSearch,
   state,
   onSelectHistory,
+  header,
 }: BookmarkSearchResultsProps) {
   const {
     history,
@@ -47,15 +49,18 @@ export default function BookmarkSearchResults({
         renderItem={renderHistoryItem}
         keyExtractor={(item, index) => `${item}-${index}`}
         ListHeaderComponent={
-          <View className="flex-row items-center justify-between p-3">
-            <Text className="text-sm font-bold text-gray-500">
-              Recent Searches
-            </Text>
-            {history.length > 0 && (
-              <Pressable onPress={clearHistory}>
-                <Text className="text-sm text-blue-500">Clear</Text>
-              </Pressable>
-            )}
+          <View>
+            {header}
+            <View className="flex-row items-center justify-between p-3">
+              <Text className="text-sm font-bold text-gray-500">
+                Recent Searches
+              </Text>
+              {history.length > 0 && (
+                <Pressable onPress={clearHistory}>
+                  <Text className="text-sm text-blue-500">Clear</Text>
+                </Pressable>
+              )}
+            </View>
           </View>
         }
         ListEmptyComponent={
@@ -79,6 +84,7 @@ export default function BookmarkSearchResults({
       isFetchingNextPage={isFetchingNextPage}
       onRefresh={onRefresh}
       isRefreshing={isPending}
+      header={header}
     />
   );
 }

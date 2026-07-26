@@ -13,6 +13,7 @@ import {
   setupCachePersistence,
   setupOnlineManager,
 } from "./offlineCache";
+import { ClientConfigProvider } from "./client-config";
 import { ConnectionStatusProvider } from "./useConnectionStatus";
 import { ReaderSettingsProvider } from "./readerSettings";
 import useAppSettings from "./settings";
@@ -50,12 +51,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
       persistOptions={persistOptions}
     >
       <TRPCSettingsProvider settings={settings} queryClient={queryClient}>
-        <ConnectionStatusProvider enabled={!!settings.apiKey}>
-          <ReaderSettingsProvider>
-            {children}
-            <Toaster />
-          </ReaderSettingsProvider>
-        </ConnectionStatusProvider>
+        <ClientConfigProvider>
+          <ConnectionStatusProvider enabled={!!settings.apiKey}>
+            <ReaderSettingsProvider>
+              {children}
+              <Toaster />
+            </ReaderSettingsProvider>
+          </ConnectionStatusProvider>
+        </ClientConfigProvider>
       </TRPCSettingsProvider>
     </PersistQueryClientProvider>
   );

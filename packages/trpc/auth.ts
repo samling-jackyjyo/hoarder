@@ -1,5 +1,5 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
-import * as bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { and, eq } from "drizzle-orm";
 
 import { apiKeys } from "@karakeep/db/schema";

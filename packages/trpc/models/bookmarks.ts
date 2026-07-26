@@ -238,6 +238,7 @@ export class Bookmark extends BareBookmark {
         assetType: mapDBAssetTypeToUserType(a.assetType),
         fileName: a.fileName,
       })),
+      firstCreatedAt: bookmark.dbCreatedAt,
       ...rest,
     };
   }
@@ -394,6 +395,7 @@ export class Bookmark extends BareBookmark {
       id: bookmark.id,
       type: bookmark.type,
       source: bookmark.source,
+      firstCreatedAt: bookmark.dbCreatedAt,
       createdAt: bookmark.createdAt,
       modifiedAt: bookmark.modifiedAt,
       title: bookmark.title,
@@ -554,7 +556,7 @@ export class Bookmark extends BareBookmark {
       );
     } else {
       // PATH: No list/tag/rssFeed filter - query bookmarks directly
-      // Uses composite index: bookmarks_userId_createdAt_id_idx (or archived/favourited variants)
+      // Uses composite index: bookmarks_userId_lastSavedAt_id_idx (or archived/favourited variants)
       sq = ctx.db.$with("bookmarksSq").as(
         ctx.db
           .select()
@@ -636,6 +638,7 @@ export class Bookmark extends BareBookmark {
           }
           acc[bookmarkId] = {
             ...row.bookmarksSq,
+            firstCreatedAt: row.bookmarksSq.dbCreatedAt,
             content,
             tags: [],
             assets: [],

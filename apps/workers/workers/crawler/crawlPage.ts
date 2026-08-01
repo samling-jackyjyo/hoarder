@@ -32,7 +32,10 @@ import logger from "@karakeep/shared/logger";
 import { tryCatch } from "@karakeep/shared/tryCatch";
 
 import type { AutoconsentHandle } from "./autoconsent";
-import { installAutoconsent, waitForAutoconsent } from "./autoconsent";
+import {
+  installAutoconsent,
+  waitForPageLoadAndAutoconsent,
+} from "./autoconsent";
 import {
   CONTEXT_CLOSE_TIMEOUT_MS,
   PAGE_CLOSE_TIMEOUT_MS,
@@ -719,7 +722,7 @@ export async function crawlPage(
         );
 
         // Wait until network is relatively idle or timeout after 5 seconds
-        await withSpan(
+        const pageLoad = withSpan(
           tracer,
           "crawlerWorker.crawlPage.waitForLoadState",
           {
@@ -740,17 +743,17 @@ export async function crawlPage(
           },
         );
 
+        await waitForPageLoadAndAutoconsent(
+          pageLoad,
+          autoconsentHandle,
+          abortSignal,
+        );
+
         abortSignal.throwIfAborted();
 
         logger.info(
           `[Crawler][${jobId}] Finished waiting for the page to load.`,
         );
-
-        // If a consent dialog was detected, give autoconsent up to 3s to finish
-        // opting out before we capture the HTML/screenshot/PDF. No CMP → no
-        // added latency.
-        await waitForAutoconsent(autoconsentHandle, abortSignal);
-        abortSignal.throwIfAborted();
 
         const [htmlContent, screenshot, pdf] = await capturePageAssets(
           activePage,

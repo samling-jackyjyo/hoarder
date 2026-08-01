@@ -247,3 +247,24 @@ export async function waitForAutoconsent(
     abortRaceResolve(abortSignal, undefined),
   );
 }
+
+/**
+ * Lets autoconsent use the time already spent waiting for the page to settle.
+ *
+ * No-CMP detection can take longer than our autoconsent budget because the
+ * library retries detection several times. Waiting for it only after the page
+ * load wait therefore adds the full timeout to ordinary pages. Start both
+ * waits together instead. If a CMP appears after the initial autoconsent wait
+ * timed out, wait once more for the actual opt-out action before capture.
+ */
+export async function waitForPageLoadAndAutoconsent(
+  pageLoad: Promise<unknown>,
+  handle: AutoconsentHandle | undefined,
+  abortSignal: AbortSignal,
+): Promise<void> {
+  await Promise.all([pageLoad, waitForAutoconsent(handle, abortSignal)]);
+
+  if (handle?.cmpDetected()) {
+    await waitForAutoconsent(handle, abortSignal);
+  }
+}

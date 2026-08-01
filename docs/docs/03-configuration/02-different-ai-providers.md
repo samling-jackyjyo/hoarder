@@ -12,6 +12,8 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # You can change the default models by uncommenting the following lines, and choosing your model.
 # INFERENCE_TEXT_MODEL=gpt-4.1-mini
 # INFERENCE_IMAGE_MODEL=gpt-4o-mini
+# EMBEDDING_TEXT_MODEL=text-embedding-3-small
+# EMBEDDING_DIMENSIONS=1536
 ```
 
 ## Ollama
@@ -34,6 +36,9 @@ OPENAI_BASE_URL=http://ollama.mylab.com:11434/v1
 # Make sure to pull the models in ollama first. Example models:
 INFERENCE_TEXT_MODEL=gemma3
 INFERENCE_IMAGE_MODEL=llava
+EMBEDDING_TEXT_MODEL=embeddinggemma
+EMBEDDING_DIMENSIONS=768
+EMBEDDING_CONTEXT_LENGTH=2048
 ```
 
 ### Option 2: Native Ollama API
@@ -48,6 +53,9 @@ OLLAMA_BASE_URL=http://ollama.mylab.com:11434
 # Make sure to pull the models in ollama first. Example models:
 INFERENCE_TEXT_MODEL=gemma3
 INFERENCE_IMAGE_MODEL=llava
+EMBEDDING_TEXT_MODEL=embeddinggemma
+EMBEDDING_DIMENSIONS=768
+EMBEDDING_CONTEXT_LENGTH=2048
 
 # If the model you're using doesn't support structured output, you also need:
 # INFERENCE_OUTPUT_SCHEMA=plain
@@ -69,6 +77,9 @@ OPENAI_API_KEY=YOUR_API_KEY
 # Example models:
 INFERENCE_TEXT_MODEL=gemini-2.5-flash-lite
 INFERENCE_IMAGE_MODEL=gemini-2.5-flash-lite
+EMBEDDING_TEXT_MODEL=gemini-embedding-2
+EMBEDDING_DIMENSIONS=3072
+
 ```
 
 ## OpenRouter
@@ -80,6 +91,7 @@ OPENAI_API_KEY=YOUR_API_KEY
 # Example models:
 INFERENCE_TEXT_MODEL=meta-llama/llama-4-scout
 INFERENCE_IMAGE_MODEL=meta-llama/llama-4-scout
+EMBEDDING_TEXT_MODEL=openai/text-embedding-3-small
 ```
 
 ## Perplexity
@@ -124,5 +136,28 @@ OPENAI_API_KEY=Your Cloudflare Workers AI Token
 # Example models:
 INFERENCE_TEXT_MODEL=@cf/meta/llama-3.1-8b-instruct-fast
 INFERENCE_IMAGE_MODEL=@cf/meta/llama-3.2-11b-vision-instruct
+EMBEDDING_TEXT_MODEL=@cf/google/embeddinggemma-300m
+EMBEDDING_DIMENSIONS=768
+EMBEDDING_CONTEXT_LENGTH=2048
 INFERENCE_OUTPUT_SCHEMA=json
 ```
+
+
+# Configuring Embedding Models
+
+Karakeep uses embedding models for stuff like semantic search and refining tag suggestions. Typically, when you configure an embedding model, you'll want to configure its default num dimensions and context length. Those are done via:
+
+```
+EMBEDDING_TEXT_MODEL=
+EMBEDDING_DIMENSIONS=
+EMBEDDING_CONTEXT_LENGTH=
+```
+
+
+Once you've configured an embedding model, you'll also want to enable auto-embedding generation for your bookmarks by:
+
+```
+EMBEDDING_ENABLE_AUTO_INDEXING=true
+```
+
+Note: Embeddings from different models are not compatible with each other. If you're to ever change the embedding model or the number of dimensions, you'll need to regenerate embeddings for *all* of your bookmarks.

@@ -90,7 +90,7 @@ const allEnv = z.object({
   INFERENCE_FETCH_TIMEOUT_SEC: z.coerce.number().default(300),
   INFERENCE_TEXT_MODEL: z.string().default("gpt-4.1-mini"),
   INFERENCE_IMAGE_MODEL: z.string().default("gpt-4o-mini"),
-  EMBEDDING_ENABLE_AUTO_INDEXING: stringBool("false"),
+  EMBEDDING_ENABLE_AUTO_INDEXING: optionalStringBool(),
   EMBEDDING_TEXT_MODEL: z.string().default("text-embedding-3-small"),
   EMBEDDING_DIMENSIONS: z.coerce.number().default(1536),
   EMBEDDING_CONTEXT_LENGTH: z.coerce.number().int().positive().default(8000),
@@ -360,7 +360,11 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
       semanticSearch: val.SEMANTIC_SEARCH_ENABLED,
     },
     embedding: {
-      enableAutoIndexing: val.EMBEDDING_ENABLE_AUTO_INDEXING,
+      enableAutoIndexing:
+        val.EMBEDDING_ENABLE_AUTO_INDEXING === undefined
+          ? // Enabled by default if using the default inference configuration (based on OpenAI models)
+            !val.OLLAMA_BASE_URL && !val.OPENAI_BASE_URL && !!val.OPENAI_API_KEY
+          : val.EMBEDDING_ENABLE_AUTO_INDEXING,
       textModel: val.EMBEDDING_TEXT_MODEL,
       dimensions: val.EMBEDDING_DIMENSIONS,
       contextLength: val.EMBEDDING_CONTEXT_LENGTH,

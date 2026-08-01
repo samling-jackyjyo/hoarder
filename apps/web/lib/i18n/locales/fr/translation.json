@@ -329,6 +329,10 @@
           "users": {
             "label": "Admin : utilisateurs",
             "description": "Accéder à la gestion administrative des utilisateurs."
+          },
+          "subscriptions": {
+            "label": "Admin : abonnements",
+            "description": "Gérer les niveaux d'abonnement des utilisateurs."
           }
         }
       }
@@ -519,7 +523,8 @@
         "processing": "Traitement",
         "staging": "Préparation",
         "running": "En cours d’exécution",
-        "paused": "En pause"
+        "paused": "En pause",
+        "archived": "Archivé"
       },
       "badges": {
         "pending": "{{count}} en attente",
@@ -556,7 +561,8 @@
         "no_results": "Aucun résultat trouvé pour ce filtre.",
         "view_bookmark": "Voir le marque-page",
         "load_more": "Charger plus",
-        "no_title": "Pas de titre"
+        "no_title": "Pas de titre",
+        "archived_results": "Les résultats de favoris individuels ne sont plus conservés pour les sessions d'importation archivées."
       },
       "finalize_dialog_title": "Finaliser la session d'importation",
       "finalize_dialog_description": "Mettre en file d'attente « {{name}} » pour le traitement en arrière-plan ? L'importation des signets préparés va commencer.",
@@ -1080,7 +1086,18 @@
     "lists": "Listes",
     "feeds": "Flux",
     "is_from_source": "La source est",
-    "is_not_from_source": "La source n'est pas"
+    "is_not_from_source": "La source n'est pas",
+    "mode_label": "Mode de recherche",
+    "mode_label_description": "Choisissez comment Karakeep trouve les favoris correspondants.",
+    "mode_keyword": "Mot-clé",
+    "mode_keyword_description": "Faites correspondre des mots exacts dans les titres, le contenu, les URL et les notes. Presque instantané.",
+    "mode_hybrid": "Hybride",
+    "mode_hybrid_description": "Mélangez les correspondances exactes avec des idées liées pour le meilleur équilibre. Plus lent que la recherche par mots-clés.",
+    "mode_semantic": "Sémantique",
+    "mode_semantic_description": "Trouvez des favoris conceptuellement similaires, même sans mots communs. Plus lent que la recherche par mots-clés.",
+    "keyword_placeholder": "Rechercher dans les titres, le texte, les URL et les étiquettes…",
+    "hybrid_placeholder": "Rechercher par mots ou par sens…",
+    "semantic_placeholder": "Décrivez ce dont vous vous souvenez…"
   },
   "dialogs": {
     "bookmarks": {

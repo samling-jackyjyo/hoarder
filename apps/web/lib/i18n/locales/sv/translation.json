@@ -328,6 +328,10 @@
           "users": {
             "label": "Admin: användare",
             "description": "Få tillgång till administrativ användarhantering."
+          },
+          "subscriptions": {
+            "label": "Admin: prenumerationer",
+            "description": "Hantera nivåer för användarprenumerationer."
           }
         }
       }
@@ -519,7 +523,8 @@
         "processing": "Bearbetar",
         "staging": "Mellanlagring",
         "running": "Kör",
-        "paused": "Pausad"
+        "paused": "Pausad",
+        "archived": "Arkiverad"
       },
       "badges": {
         "pending": "{{count}} väntar",
@@ -556,7 +561,8 @@
         "no_results": "Inga resultat hittades för detta filter.",
         "view_bookmark": "Visa bokmärke",
         "load_more": "Ladda mer",
-        "no_title": "Ingen titel"
+        "no_title": "Ingen titel",
+        "archived_results": "Individuella bokmärkesresultat sparas inte längre för arkiverade importsessioner."
       },
       "finalize_dialog_title": "Slutför importsession",
       "finalize_dialog_description": "Vill du köa \"{{name}}\" för bakgrundsbearbetning? Förberedda bokmärken kommer att börja importeras.",
@@ -1087,7 +1093,18 @@
     "lists": "Listor",
     "feeds": "Feeds",
     "is_from_source": "Källa är",
-    "is_not_from_source": "Källa är inte"
+    "is_not_from_source": "Källa är inte",
+    "mode_label": "Sökläge",
+    "mode_label_description": "Välj hur Karakeep hittar matchande bokmärken.",
+    "mode_keyword": "Nyckelord",
+    "mode_keyword_description": "Matcha exakta ord i titlar, innehåll, webbadresser och anteckningar. Nästan omedelbart.",
+    "mode_hybrid": "Hybrid",
+    "mode_hybrid_description": "Blanda exakta matchningar med relaterade idéer för bästa balans. Långsammare än nyckelordssökning.",
+    "mode_semantic": "Semantisk",
+    "mode_semantic_description": "Hitta konceptuellt liknande bokmärken, även utan gemensamma ord. Långsammare än nyckelordssökning.",
+    "keyword_placeholder": "Sök i titlar, text, webbadresser och taggar…",
+    "hybrid_placeholder": "Sök på ord eller betydelse…",
+    "semantic_placeholder": "Beskriv vad du kommer ihåg…"
   },
   "highlights": {
     "no_highlights": "Du har inga markeringar ännu."

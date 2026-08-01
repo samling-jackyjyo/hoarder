@@ -282,6 +282,10 @@
           "users": {
             "label": "Admin: brugere",
             "description": "Få adgang til administrativ brugerstyring."
+          },
+          "subscriptions": {
+            "label": "Admin: abonnementer",
+            "description": "Administrer abonnementstyper for brugere."
           }
         }
       }
@@ -467,7 +471,8 @@
         "processing": "Behandler",
         "staging": "Forberedelse",
         "running": "Kører",
-        "paused": "Sat på pause"
+        "paused": "Sat på pause",
+        "archived": "Arkiveret"
       },
       "badges": {
         "pending": "{{count}} afventer",
@@ -504,7 +509,8 @@
         "no_results": "Ingen resultater fundet for dette filter.",
         "view_bookmark": "Vis bogmærke",
         "load_more": "Indlæs mere",
-        "no_title": "Ingen titel"
+        "no_title": "Ingen titel",
+        "archived_results": "Individuelle bogmærkeresultater opbevares ikke længere for arkiverede importsessioner."
       },
       "finalize_dialog_title": "Færdiggør importsession",
       "finalize_dialog_description": "Sæt \"{{name}}\" i kø til baggrundsbehandling? De klargjorte bogmærker vil begynde at blive importeret.",
@@ -1083,7 +1089,18 @@
     "lists": "Lister",
     "feeds": "Feeds",
     "is_from_source": "Kilde er",
-    "is_not_from_source": "Kilden er ikke"
+    "is_not_from_source": "Kilden er ikke",
+    "mode_label": "Søgetilstand",
+    "mode_label_description": "Vælg hvordan Karakeep finder matchende bogmærker.",
+    "mode_keyword": "Nøgleord",
+    "mode_keyword_description": "Match eksakte ord i titler, indhold, URL'er og noter. Næsten øjeblikkeligt.",
+    "mode_hybrid": "Hybrid",
+    "mode_hybrid_description": "Bland eksakte matches med relaterede idéer for den bedste balance. Langsommere end nøgleordssøgning.",
+    "mode_semantic": "Semantisk",
+    "mode_semantic_description": "Find konceptuelt lignende bogmærker, selv uden fælles ord. Langsommere end nøgleordssøgning.",
+    "keyword_placeholder": "Søg i titler, tekst, URL'er og tags…",
+    "hybrid_placeholder": "Søg efter ord eller betydning…",
+    "semantic_placeholder": "Beskriv hvad du husker…"
   },
   "dialogs": {
     "bookmarks": {

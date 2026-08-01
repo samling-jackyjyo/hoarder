@@ -341,6 +341,10 @@
           "users": {
             "label": "Admin: usuários",
             "description": "Acesse o gerenciamento administrativo de usuários."
+          },
+          "subscriptions": {
+            "label": "Admin: assinaturas",
+            "description": "Gerenciar níveis de assinatura de usuários."
           }
         }
       }
@@ -513,7 +517,8 @@
         "processing": "Processando",
         "staging": "Em Preparação",
         "running": "Executando",
-        "paused": "Pausado"
+        "paused": "Pausado",
+        "archived": "Arquivado"
       },
       "badges": {
         "pending": "{{count}} pendentes",
@@ -550,7 +555,8 @@
         "no_results": "Nenhum resultado encontrado para este filtro.",
         "view_bookmark": "Ver Marcador",
         "load_more": "Carregar mais",
-        "no_title": "Sem título"
+        "no_title": "Sem título",
+        "archived_results": "Resultados de favoritos individuais não são mais retidos para sessões de importação arquivadas."
       },
       "finalize_dialog_title": "Finalizar sessão de importação",
       "finalize_dialog_description": "Colocar \"{{name}}\" na fila para processamento em segundo plano? Os favoritos preparados começarão a ser importados.",
@@ -976,7 +982,18 @@
     "lists": "Listas",
     "feeds": "Feeds",
     "is_from_source": "Fonte é",
-    "is_not_from_source": "A fonte não é"
+    "is_not_from_source": "A fonte não é",
+    "mode_label": "Modo de busca",
+    "mode_label_description": "Escolha como o Karakeep encontra favoritos correspondentes.",
+    "mode_keyword": "Palavra-chave",
+    "mode_keyword_description": "Corresponder palavras exatas em títulos, conteúdo, URLs e notas. Quase instantâneo.",
+    "mode_hybrid": "Híbrido",
+    "mode_hybrid_description": "Misture correspondências exatas com ideias relacionadas para o melhor equilíbrio. Mais lento que a busca por palavra-chave.",
+    "mode_semantic": "Semântico",
+    "mode_semantic_description": "Encontre favoritos conceitualmente semelhantes, mesmo sem palavras compartilhadas. Mais lento que a busca por palavra-chave.",
+    "keyword_placeholder": "Buscar títulos, texto, URLs e etiquetas…",
+    "hybrid_placeholder": "Buscar por palavras ou significado…",
+    "semantic_placeholder": "Descreva o que você lembra…"
   },
   "preview": {
     "view_original": "Ver Original",

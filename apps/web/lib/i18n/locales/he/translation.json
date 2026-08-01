@@ -415,6 +415,10 @@
           "users": {
             "label": "ניהול: משתמשים",
             "description": "גישה לניהול משתמשים ניהולי."
+          },
+          "subscriptions": {
+            "label": "ניהול: מנויים",
+            "description": "ניהול דרגות מנוי של משתמשים."
           }
         }
       }
@@ -531,7 +535,8 @@
         "running": "פועל",
         "paused": "מושהה",
         "completed": "הושלם",
-        "failed": "נכשל"
+        "failed": "נכשל",
+        "archived": "בארכיון"
       },
       "badges": {
         "pending": "{{count}} בהמתנה",
@@ -571,7 +576,8 @@
         "no_results": "לא נמצאו תוצאות עבור מסנן זה.",
         "view_bookmark": "צפייה בסימנייה",
         "load_more": "טען עוד",
-        "no_title": "ללא כותרת"
+        "no_title": "ללא כותרת",
+        "archived_results": "תוצאות סימניות בודדות אינן נשמרות עוד עבור סבבי ייבוא שבארכיון."
       }
     },
     "backups": {
@@ -957,7 +963,18 @@
     "tags": "תגיות",
     "lists": "רשימות",
     "feeds": "פידים",
-    "no_suggestions": "אין הצעות"
+    "no_suggestions": "אין הצעות",
+    "mode_label": "מצב חיפוש",
+    "mode_label_description": "בחרו כיצד Karakeep מוצא סימניות תואמות.",
+    "mode_keyword": "מילת מפתח",
+    "mode_keyword_description": "התאמת מילים מדויקות בכותרות, תכנים, כתובות URL והערות. כמעט מיידי.",
+    "mode_hybrid": "היברידי",
+    "mode_hybrid_description": "שילוב בין התאמות מדויקות לרעיונות קשורים לאיזון המיטבי. איטי יותר מחיפוש לפי מילת מפתח.",
+    "mode_semantic": "סמנטי",
+    "mode_semantic_description": "חיפוש סימניות דומות מבחינה רעיונית, גם ללא מילים משותפות. איטי יותר מחיפוש לפי מילת מפתח.",
+    "keyword_placeholder": "חיפוש בכותרות, טקסט, כתובות URL ותגיות…",
+    "hybrid_placeholder": "חיפוש לפי מילים או משמעות…",
+    "semantic_placeholder": "תארו את מה שאתם זוכרים…"
   },
   "preview": {
     "view_original": "הצג מקור",

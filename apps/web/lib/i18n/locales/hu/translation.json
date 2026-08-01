@@ -277,6 +277,10 @@
           "users": {
             "label": "Admin: felhasználók",
             "description": "Adminisztratív felhasználókezelés elérése."
+          },
+          "subscriptions": {
+            "label": "Admin: feliratkozások",
+            "description": "Felhasználói előfizetési szintek kezelése."
           }
         }
       }
@@ -467,7 +471,8 @@
         "processing": "Feldolgozás",
         "staging": "Előkészítés",
         "running": "Futás",
-        "paused": "Szüneteltetve"
+        "paused": "Szüneteltetve",
+        "archived": "Archiválva"
       },
       "badges": {
         "pending": "{{count}} függőben",
@@ -504,7 +509,8 @@
         "no_results": "Nincsenek találatok ehhez a szűrőhöz.",
         "view_bookmark": "Könyvjelző megtekintése",
         "load_more": "Tölts be többet",
-        "no_title": "Nincs cím"
+        "no_title": "Nincs cím",
+        "archived_results": "Az egyéni könyvjelző-eredmények már nem maradnak meg az archivált importálási folyamatokhoz."
       },
       "finalize_dialog_title": "Importálási munkamenet véglegesítése",
       "finalize_dialog_description": "Sorba állítja a(z) „{{name}}” elemet háttérfeldolgozáshoz? Az előkészített könyvjelzők importálása megkezdődik.",
@@ -712,7 +718,18 @@
     "lists": "Listák",
     "feeds": "Hírcsatornák",
     "is_from_source": "A forrás a következő:",
-    "is_not_from_source": "A forrás nem"
+    "is_not_from_source": "A forrás nem",
+    "mode_label": "Keresési mód",
+    "mode_label_description": "Válassza ki, hogyan találja meg a Karakeep az egyező könyvjelzőket.",
+    "mode_keyword": "Kulcsszó",
+    "mode_keyword_description": "Pontos szavak keresése a címekben, tartalomban, URL-ekben és megjegyzésekben. Szinte azonnali.",
+    "mode_hybrid": "Hibrid",
+    "mode_hybrid_description": "A pontos egyezések és a kapcsolódó fogalmak ötvözése a legjobb egyensúly érdekében. Lassabb, mint a kulcsszavas keresés.",
+    "mode_semantic": "Szemantikus",
+    "mode_semantic_description": "Fogalmilag hasonló könyvjelzők keresése, közös szavak nélkül is. Lassabb, mint a kulcsszavas keresés.",
+    "keyword_placeholder": "Keresés címekben, szövegekben, URL-ekben és címkékben…",
+    "hybrid_placeholder": "Keresés szavak vagy jelentés alapján…",
+    "semantic_placeholder": "Írja le, mire emlékszik…"
   },
   "lists": {
     "manual_list": "Manuális lista",

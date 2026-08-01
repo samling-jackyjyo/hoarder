@@ -447,6 +447,10 @@
           "users": {
             "label": "Admin: korisnici",
             "description": "Pristup administrativnom upravljanju korisnicima."
+          },
+          "subscriptions": {
+            "label": "Administrator: pretplate",
+            "description": "Upravljanje razinama korisničkih pretplata."
           }
         }
       }
@@ -643,7 +647,8 @@
         "processing": "Obrada",
         "staging": "Priprema",
         "running": "U tijeku",
-        "paused": "Pauzirano"
+        "paused": "Pauzirano",
+        "archived": "Arhivirano"
       },
       "badges": {
         "pending": "{{count}} na čekanju",
@@ -680,7 +685,8 @@
         "no_results": "Nema rezultata za ovaj filtar.",
         "view_bookmark": "Pogledaj oznaku",
         "load_more": "Učitaj više",
-        "no_title": "Bez naslova"
+        "no_title": "Bez naslova",
+        "archived_results": "Pojedinačni rezultati knjižnica više se ne pohranjuju za arhivirane sesije uvoza."
       },
       "finalize_dialog_title": "Dovrši sesiju uvoza",
       "finalize_dialog_description": "Staviti „{{name}}“ u red čekanja za pozadinsku obradu? Pripremljene oznake počet će se uvoziti.",
@@ -1083,7 +1089,18 @@
     "lists": "Popisi",
     "feeds": "Kanali",
     "is_from_source": "Izvor je",
-    "is_not_from_source": "Izvor nije"
+    "is_not_from_source": "Izvor nije",
+    "mode_label": "Način pretraživanja",
+    "mode_label_description": "Odaberite kako Karakeep pronalazi podudarne knjižnice.",
+    "mode_keyword": "Ključna riječ",
+    "mode_keyword_description": "Podudaranje točnih riječi u naslovima, sadržaju, URL-ovima i bilješkama. Gotovo trenutno.",
+    "mode_hybrid": "Hibridno",
+    "mode_hybrid_description": "Kombinirajte točna podudaranja s povezanim idejama za najbolju ravnotežu. Sporije od pretraživanja po ključnim riječima.",
+    "mode_semantic": "Semantičko",
+    "mode_semantic_description": "Pronađite konceptualno slične knjižnice, čak i bez zajedničkih riječi. Sporije od pretraživanja po ključnim riječima.",
+    "keyword_placeholder": "Pretraži naslove, tekst, URL-ove i oznake…",
+    "hybrid_placeholder": "Pretraži po riječima ili značenju…",
+    "semantic_placeholder": "Opišite čega se sjećate…"
   },
   "dialogs": {
     "bookmarks": {

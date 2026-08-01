@@ -98,6 +98,10 @@
           "users": {
             "label": "Administrator: uporabniki",
             "description": "Dostop do administrativnega upravljanja uporabnikov."
+          },
+          "subscriptions": {
+            "label": "Skrbnik: naročnine",
+            "description": "Upravljanje nivojev naročnin uporabnikov."
           }
         }
       }
@@ -411,7 +415,8 @@
         "processing": "Obdelava",
         "staging": "Priprava",
         "running": "Izvajanje",
-        "paused": "Začasno ustavljeno"
+        "paused": "Začasno ustavljeno",
+        "archived": "Arhivirano"
       },
       "badges": {
         "pending": "{{count}} čaka",
@@ -448,7 +453,8 @@
         "no_results": "Za ta filter ni bilo najdenih rezultatov.",
         "view_bookmark": "Prikaži zaznamek",
         "load_more": "Naloži več",
-        "no_title": "Brez naslova"
+        "no_title": "Brez naslova",
+        "archived_results": "Posamezni rezultati zaznamkov za arhivirane seje uvoza niso več shranjeni."
       },
       "finalize_dialog_title": "Dokončaj sejo uvoza",
       "finalize_dialog_description": "Želite dodati »{{name}}« v čakalno vrsto za obdelavo v ozadju? Začel se bo uvoz pripravljenih zaznamkov.",
@@ -731,7 +737,18 @@
     "lists": "Seznami",
     "feeds": "Viri",
     "is_from_source": "Vir je",
-    "is_not_from_source": "Vir ni"
+    "is_not_from_source": "Vir ni",
+    "mode_label": "Način iskanja",
+    "mode_label_description": "Izberite, kako Karakeep išče ujemajoče se zaznamke.",
+    "mode_keyword": "Ključna beseda",
+    "mode_keyword_description": "Iskanje natančnih besed v naslovih, vsebini, URL-jih in opombah. Skoraj trenutno.",
+    "mode_hybrid": "Hibridno",
+    "mode_hybrid_description": "Združevanje natančnih ujemanj s sorodnimi idejami za najboljše ravnovesje. Počasneje od iskanja po ključnih besedah.",
+    "mode_semantic": "Semantično",
+    "mode_semantic_description": "Iskanje konceptualno podobnih zaznamkov, tudi brez skupnih besed. Počasneje od iskanja po ključnih besedah.",
+    "keyword_placeholder": "Iskanje po naslovih, besedilu, URL-jih in oznakah…",
+    "hybrid_placeholder": "Iskanje po besedah ali pomenu…",
+    "semantic_placeholder": "Opišite, česa se spomnite…"
   },
   "tags": {
     "your_tags_info": "Oznake, ki si jih dodelil/a vsaj enkrat",

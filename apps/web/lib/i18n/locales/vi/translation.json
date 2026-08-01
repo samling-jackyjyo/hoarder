@@ -201,6 +201,10 @@
           "users": {
             "label": "Quản trị viên: người dùng",
             "description": "Truy cập quản lý người dùng hành chính."
+          },
+          "subscriptions": {
+            "label": "Quản trị: các gói đăng ký",
+            "description": "Quản lý các cấp độ đăng ký của người dùng."
           }
         }
       }
@@ -473,7 +477,8 @@
         "processing": "Đang xử lý",
         "staging": "Đang dàn dựng",
         "running": "Đang chạy",
-        "paused": "Đang tạm dừng"
+        "paused": "Đang tạm dừng",
+        "archived": "Đã lưu trữ"
       },
       "badges": {
         "pending": "{{count}} đang chờ xử lý",
@@ -510,7 +515,8 @@
         "no_results": "Không tìm thấy kết quả nào cho bộ lọc này.",
         "view_bookmark": "Xem dấu trang",
         "load_more": "Tải thêm",
-        "no_title": "Không có tiêu đề"
+        "no_title": "Không có tiêu đề",
+        "archived_results": "Kết quả dấu trang riêng lẻ không còn được giữ lại cho các phiên nhập đã lưu trữ."
       },
       "finalize_dialog_title": "Hoàn tất Phiên Nhập",
       "finalize_dialog_description": "Thêm \"{{name}}\" vào hàng đợi để xử lý trong nền? Các dấu trang đã chuẩn bị sẽ bắt đầu được nhập.",
@@ -939,7 +945,18 @@
     "lists": "Danh sách",
     "feeds": "Nguồn cấp dữ liệu",
     "is_from_source": "Nguồn là",
-    "is_not_from_source": "Nguồn không phải là"
+    "is_not_from_source": "Nguồn không phải là",
+    "mode_label": "Chế độ tìm kiếm",
+    "mode_label_description": "Chọn cách Karakeep tìm kiếm các dấu trang phù hợp.",
+    "mode_keyword": "Từ khóa",
+    "mode_keyword_description": "Khớp chính xác các từ trong tiêu đề, nội dung, URL và ghi chú. Gần như tức thì.",
+    "mode_hybrid": "Hỗn hợp",
+    "mode_hybrid_description": "Kết hợp các kết quả khớp chính xác với các ý tưởng liên quan để có sự cân bằng tốt nhất. Chậm hơn tìm kiếm theo từ khóa.",
+    "mode_semantic": "Ngữ nghĩa",
+    "mode_semantic_description": "Tìm các dấu trang có nội dung tương tự, ngay cả khi không có từ ngữ chung. Chậm hơn tìm kiếm theo từ khóa.",
+    "keyword_placeholder": "Tìm kiếm tiêu đề, văn bản, URL và thẻ…",
+    "hybrid_placeholder": "Tìm kiếm theo từ ngữ hoặc ý nghĩa…",
+    "semantic_placeholder": "Mô tả những gì bạn nhớ…"
   },
   "tags": {
     "all_tags": "Tất cả nhãn",

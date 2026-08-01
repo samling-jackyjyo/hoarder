@@ -391,6 +391,10 @@
           "users": {
             "label": "Admin: usuarios",
             "description": "Acceder á xestión administrativa de usuarios."
+          },
+          "subscriptions": {
+            "label": "Admin: subscricións",
+            "description": "Xestionar os niveis de subscrición dos usuarios."
           }
         }
       }
@@ -581,7 +585,8 @@
         "processing": "Procesando",
         "staging": "Preparando",
         "running": "Executando",
-        "paused": "En pausa"
+        "paused": "En pausa",
+        "archived": "Arquivado"
       },
       "badges": {
         "pending": "{{count}} pendentes",
@@ -618,7 +623,8 @@
         "no_results": "Non se atoparon resultados para este filtro.",
         "view_bookmark": "Ver o marcador",
         "load_more": "Cargar máis",
-        "no_title": "Sen título"
+        "no_title": "Sen título",
+        "archived_results": "Os resultados individuais dos marcadores xa non se conservan para as sesións de importación arquivadas."
       },
       "finalize_dialog_title": "Finalizar sesión de importación",
       "finalize_dialog_description": "Quere engadir \"{{name}}\" á cola para o procesamento en segundo plano? Os marcadores preparados comezarán a importarse.",
@@ -1083,7 +1089,18 @@
     "lists": "Listas",
     "feeds": "Fontes",
     "is_from_source": "Orixe é",
-    "is_not_from_source": "A orixe non é"
+    "is_not_from_source": "A orixe non é",
+    "mode_label": "Modo de busca",
+    "mode_label_description": "Escolla como Karakeep atopa marcadores coincidentes.",
+    "mode_keyword": "Palabra clave",
+    "mode_keyword_description": "Busca palabras exactas en títulos, contido, enderezos URL e notas. Case instantánea.",
+    "mode_hybrid": "Híbrida",
+    "mode_hybrid_description": "Combina coincidencias exactas con ideas relacionadas para o mellor equilibrio. Máis lenta que a busca por palabra clave.",
+    "mode_semantic": "Semántica",
+    "mode_semantic_description": "Atope marcadores conceptualmente similares, mesmo sen palabras compartidas. Máis lenta que a busca por palabra clave.",
+    "keyword_placeholder": "Buscar títulos, texto, enderezos URL e etiquetas…",
+    "hybrid_placeholder": "Buscar por palabras ou significado…",
+    "semantic_placeholder": "Describa o que lembra…"
   },
   "dialogs": {
     "bookmarks": {

@@ -329,6 +329,10 @@
           "users": {
             "label": "Admin: utenti",
             "description": "Accedi alla gestione amministrativa degli utenti."
+          },
+          "subscriptions": {
+            "label": "Amministratore: abbonamenti",
+            "description": "Gestisci i livelli di abbonamento degli utenti."
           }
         }
       }
@@ -513,7 +517,8 @@
         "processing": "Elaborazione",
         "staging": "In preparazione",
         "running": "In esecuzione",
-        "paused": "In pausa"
+        "paused": "In pausa",
+        "archived": "Archiviato"
       },
       "badges": {
         "pending": "{{count}} in sospeso",
@@ -550,7 +555,8 @@
         "no_results": "Nessun risultato trovato per questo filtro.",
         "view_bookmark": "Visualizza segnalibro",
         "load_more": "Carica altro",
-        "no_title": "Nessun titolo"
+        "no_title": "Nessun titolo",
+        "archived_results": "I risultati dei singoli segnalibri non vengono più mantenuti per le sessioni di importazione archiviate."
       },
       "finalize_dialog_title": "Finalizza sessione di importazione",
       "finalize_dialog_description": "Accodare \"{{name}}\" per l'elaborazione in background? I segnalibri preparati verranno importati.",
@@ -1080,7 +1086,18 @@
     "lists": "Elenchi",
     "feeds": "Feed",
     "is_from_source": "L'origine è",
-    "is_not_from_source": "L'origine non è"
+    "is_not_from_source": "L'origine non è",
+    "mode_label": "Modalità di ricerca",
+    "mode_label_description": "Scegli come Karakeep trova i segnalibri corrispondenti.",
+    "mode_keyword": "Parola chiave",
+    "mode_keyword_description": "Corrispondenza di parole esatte in titoli, contenuti, URL e note. Quasi istantaneo.",
+    "mode_hybrid": "Ibrida",
+    "mode_hybrid_description": "Combina corrispondenze esatte con concetti correlati per il miglior equilibrio. Più lenta della ricerca per parola chiave.",
+    "mode_semantic": "Semantica",
+    "mode_semantic_description": "Trova segnalibri concettualmente simili, anche senza parole condivise. Più lenta della ricerca per parola chiave.",
+    "keyword_placeholder": "Cerca tra titoli, testi, URL e tag…",
+    "hybrid_placeholder": "Cerca per parole o significato…",
+    "semantic_placeholder": "Descrivi ciò che ricordi…"
   },
   "dialogs": {
     "bookmarks": {

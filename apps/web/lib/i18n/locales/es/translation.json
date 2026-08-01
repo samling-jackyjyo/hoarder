@@ -267,6 +267,10 @@
           "users": {
             "label": "Admin: usuarios",
             "description": "Acceda a la gestión administrativa de usuarios."
+          },
+          "subscriptions": {
+            "label": "Administrador: suscripciones",
+            "description": "Gestionar los niveles de suscripción de los usuarios."
           }
         }
       }
@@ -457,7 +461,8 @@
         "processing": "Procesando",
         "staging": "En preparación",
         "running": "En curso",
-        "paused": "En pausa"
+        "paused": "En pausa",
+        "archived": "Archivada"
       },
       "badges": {
         "pending": "{{count}} pendientes",
@@ -494,7 +499,8 @@
         "no_results": "No se encontraron resultados para este filtro.",
         "view_bookmark": "Ver marcador",
         "load_more": "Cargar más",
-        "no_title": "Sin título"
+        "no_title": "Sin título",
+        "archived_results": "Los resultados de marcadores individuales ya no se conservan para las sesiones de importación archivadas."
       },
       "finalize_dialog_title": "Finalizar sesión de importación",
       "finalize_dialog_description": "¿Poner \"{{name}}\" en la cola para el procesamiento en segundo plano? Los marcadores preparados comenzarán a importarse.",
@@ -1083,7 +1089,18 @@
     "lists": "Listas",
     "feeds": "Feeds",
     "is_from_source": "El origen es",
-    "is_not_from_source": "El origen no es"
+    "is_not_from_source": "El origen no es",
+    "mode_label": "Modo de búsqueda",
+    "mode_label_description": "Elija cómo Karakeep encuentra marcadores coincidentes.",
+    "mode_keyword": "Palabra clave",
+    "mode_keyword_description": "Busca coincidencias exactas en títulos, contenido, URL y notas. Casi instantáneo.",
+    "mode_hybrid": "Híbrido",
+    "mode_hybrid_description": "Combina coincidencias exactas con ideas relacionadas para obtener el mejor equilibrio. Más lento que la búsqueda por palabra clave.",
+    "mode_semantic": "Semántico",
+    "mode_semantic_description": "Encuentra marcadores conceptualmente similares, incluso sin palabras compartidas. Más lento que la búsqueda por palabra clave.",
+    "keyword_placeholder": "Buscar títulos, texto, URL y etiquetas…",
+    "hybrid_placeholder": "Buscar por palabras o por significado…",
+    "semantic_placeholder": "Describa lo que recuerda…"
   },
   "dialogs": {
     "bookmarks": {

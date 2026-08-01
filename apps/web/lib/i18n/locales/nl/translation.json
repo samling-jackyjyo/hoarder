@@ -261,6 +261,10 @@
           "users": {
             "label": "Admin: gebruikers",
             "description": "Toegang tot het administratieve gebruikersbeheer."
+          },
+          "subscriptions": {
+            "label": "Beheer: abonnementen",
+            "description": "Beheer abonnementsvormen van gebruikers."
           }
         }
       }
@@ -519,7 +523,8 @@
         "processing": "Verwerken",
         "staging": "Voorbereiding",
         "running": "Actief",
-        "paused": "Gepauzeerd"
+        "paused": "Gepauzeerd",
+        "archived": "Gearchiveerd"
       },
       "badges": {
         "pending": "{{count}} in behandeling",
@@ -556,7 +561,8 @@
         "no_results": "Geen resultaten gevonden voor dit filter.",
         "view_bookmark": "Bladwijzer bekijken",
         "load_more": "Meer laden",
-        "no_title": "Geen titel"
+        "no_title": "Geen titel",
+        "archived_results": "Individuele bladwijzerresultaten worden niet langer bewaard voor gearchiveerde import-sessies."
       },
       "finalize_dialog_title": "Import-sessie afronden",
       "finalize_dialog_description": "Zet \"{{name}}\" in de wachtrij voor verwerking op de achtergrond? Voorbereide bladwijzers worden geïmporteerd.",
@@ -1048,7 +1054,18 @@
     "lists": "Lijsten",
     "feeds": "Feeds",
     "is_from_source": "Bron is",
-    "is_not_from_source": "Bron is niet"
+    "is_not_from_source": "Bron is niet",
+    "mode_label": "Zoekmodus",
+    "mode_label_description": "Kies hoe Karakeep naar overeenkomende bladwijzers zoekt.",
+    "mode_keyword": "Trefwoord",
+    "mode_keyword_description": "Zoek op exacte woorden in titels, inhoud, URL's en notities. Vrijwel onmiddellijk.",
+    "mode_hybrid": "Hybride",
+    "mode_hybrid_description": "Combineer exacte resultaten met gerelateerde ideeën voor de beste balans. Langzamer dan zoeken op trefwoord.",
+    "mode_semantic": "Semantisch",
+    "mode_semantic_description": "Vind conceptueel vergelijkbare bladwijzers, zelfs zonder gedeelde woorden. Langzamer dan zoeken op trefwoord.",
+    "keyword_placeholder": "Zoek in titels, tekst, URL's en tags…",
+    "hybrid_placeholder": "Zoek op woorden of betekenis…",
+    "semantic_placeholder": "Beschrijf wat u zich herinnert…"
   },
   "dialogs": {
     "bookmarks": {

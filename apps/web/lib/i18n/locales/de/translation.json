@@ -313,6 +313,10 @@
           "users": {
             "label": "Admin: Benutzer",
             "description": "Zugriff auf die administrative Benutzerverwaltung."
+          },
+          "subscriptions": {
+            "label": "Admin: Abonnements",
+            "description": "Verwalten Sie die Abonnementstufen der Benutzer."
           }
         },
         "scopes": "Berechtigungen",
@@ -519,7 +523,8 @@
         "processing": "Wird verarbeitet",
         "staging": "Wird vorbereitet",
         "running": "Läuft",
-        "paused": "Pausiert"
+        "paused": "Pausiert",
+        "archived": "Archiviert"
       },
       "badges": {
         "pending": "{{count}} ausstehend",
@@ -556,7 +561,8 @@
         "no_results": "Für diesen Filter wurden keine Ergebnisse gefunden.",
         "view_bookmark": "Lesezeichen anzeigen",
         "load_more": "Mehr laden",
-        "no_title": "Kein Titel"
+        "no_title": "Kein Titel",
+        "archived_results": "Einzelne Lesezeichen-Ergebnisse werden für archivierte Importsitzungen nicht mehr aufbewahrt."
       },
       "finalize_dialog_title": "Import-Sitzung abschließen",
       "finalize_dialog_description": "„{{name}}“ zur Hintergrundverarbeitung in die Warteschlange stellen? Die vorbereiteten Lesezeichen werden importiert.",
@@ -1090,7 +1096,18 @@
     "lists": "Listen",
     "feeds": "Feeds",
     "is_from_source": "Quelle ist",
-    "is_not_from_source": "Quelle ist nicht"
+    "is_not_from_source": "Quelle ist nicht",
+    "mode_label": "Suchmodus",
+    "mode_label_description": "Wählen Sie aus, wie Karakeep passende Lesezeichen findet.",
+    "mode_keyword": "Stichwort",
+    "mode_keyword_description": "Exakte Wörter in Titeln, Inhalten, URLs und Notizen abgleichen. Nahezu sofort.",
+    "mode_hybrid": "Hybrid",
+    "mode_hybrid_description": "Kombiniert exakte Treffer mit verwandten Konzepten für die beste Balance. Langsamer als die Stichwortsuche.",
+    "mode_semantic": "Semantisch",
+    "mode_semantic_description": "Finden Sie konzeptionell ähnliche Lesezeichen, selbst ohne gemeinsame Wörter. Langsamer als die Stichwortsuche.",
+    "keyword_placeholder": "Suche in Titeln, Texten, URLs und Tags…",
+    "hybrid_placeholder": "Suche nach Wörtern oder Bedeutung…",
+    "semantic_placeholder": "Beschreiben Sie, woran Sie sich erinnern…"
   },
   "bookmark_editor": {
     "subtitle": "Ändere die Details des Lesezeichens. Klicke auf Speichern, wenn du fertig bist.",

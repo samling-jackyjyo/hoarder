@@ -351,6 +351,10 @@
           "users": {
             "label": "Ylläpitäjä: käyttäjät",
             "description": "Pääsy hallinnolliseen käyttäjänhallintaan."
+          },
+          "subscriptions": {
+            "label": "Ylläpito: tilaukset",
+            "description": "Hallinnoi käyttäjien tilaustasoja."
           }
         }
       }
@@ -523,7 +527,8 @@
         "processing": "Käsitellään",
         "staging": "Valmistellaan",
         "running": "Käynnissä",
-        "paused": "Pysäytetty"
+        "paused": "Pysäytetty",
+        "archived": "Arkistoitu"
       },
       "badges": {
         "pending": "{{count}} odottaa",
@@ -560,7 +565,8 @@
         "no_results": "Tällä suodattimella ei löytynyt tuloksia.",
         "view_bookmark": "Näytä kirjanmerkki",
         "load_more": "Lataa lisää",
-        "no_title": "Ei otsikkoa"
+        "no_title": "Ei otsikkoa",
+        "archived_results": "Yksittäisiä kirjanmerkkituloksia ei enää säilytetä arkistoiduissa tuontistreameissa."
       },
       "finalize_dialog_title": "Viimeistele tuontistunto",
       "finalize_dialog_description": "Lisätäänkö ”{{name}}” taustaprosessointijonoon? Valmistellut kirjanmerkit aletaan tuoda.",
@@ -977,7 +983,18 @@
     "lists": "Listat",
     "feeds": "Syötteet",
     "is_from_source": "Lähde on",
-    "is_not_from_source": "Lähdettä ei ole"
+    "is_not_from_source": "Lähdettä ei ole",
+    "mode_label": "Hakutila",
+    "mode_label_description": "Valitse, miten Karakeep löytää vastaavia kirjanmerkkejä.",
+    "mode_keyword": "Avainsana",
+    "mode_keyword_description": "Etsi tarkkoja sanoja otsikoista, sisällöstä, URL-osoitteista ja muistiinpanoista. Lähes välitön.",
+    "mode_hybrid": "Hybridi",
+    "mode_hybrid_description": "Yhdistä tarkat osumat ja niihin liittyvät aiheet parhaan tasapainon saavuttamiseksi. Hitaampi kuin avainsanahaku.",
+    "mode_semantic": "Semanttinen",
+    "mode_semantic_description": "Löydä käsitteellisesti samankaltaisia kirjanmerkkejä, vaikka niillä ei olisi yhteisiä sanoja. Hitaampi kuin avainsanahaku.",
+    "keyword_placeholder": "Hae otsikoista, tekstistä, URL-osoitteista ja tunnisteista…",
+    "hybrid_placeholder": "Hae sanoilla tai merkityksellä…",
+    "semantic_placeholder": "Kuvaile mitä muistat…"
   },
   "preview": {
     "view_original": "Näytä alkuperäinen",

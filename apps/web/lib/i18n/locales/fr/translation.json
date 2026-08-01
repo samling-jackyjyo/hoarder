@@ -1209,7 +1209,7 @@
     "move_up": "Déplacer vers le haut",
     "move_right": "Déplacer vers la droite",
     "open_bookmark": "Ouvrir le signet",
-    "clear_focus": "Déplacer le focus / quitter l'édition en bloc",
+    "clear_focus": "Retirer le focus / quitter l'édition en bloc",
     "toggle_favorite": "Basculer en favori",
     "toggle_archive": "Archiver / Désarchiver",
     "delete_bookmark": "Supprimer le signet",
@@ -1217,6 +1217,6 @@
     "select_all": "Tout sélectionner",
     "deselect_all": "Tout désélectionner",
     "show_help": "Afficher les raccourcis clavier",
-    "focus_search_alt": "Mettre l'accent sur la recherche"
+    "focus_search_alt": "Placer le focus sur la recherche"
   }
 }

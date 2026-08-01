@@ -1103,7 +1103,7 @@
     "bookmarks": {
       "delete_confirmation_title": "Удалить закладку?",
       "delete_confirmation_description": "Вы уверены, что хотите удалить эту закладку?",
-      "bulk_delete_confirmation_description": "Вы уверенны, что хотите удалить {{count}} закладок?"
+      "bulk_delete_confirmation_description": "Вы уверены, что хотите удалить {{count}} закладок?"
     }
   },
   "highlights": {

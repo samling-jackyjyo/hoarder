@@ -185,13 +185,13 @@
     "is_from_source": "출처:",
     "is_not_from_source": "출처가 아님",
     "mode_label": "검색 모드",
-    "mode_label_description": "Karakeep이 일치하는 북마탌을 찾는 방법을 선택하세요.",
+    "mode_label_description": "Karakeep이 일치하는 북마크를 찾는 방법을 선택하세요.",
     "mode_keyword": "키워드",
-    "mode_keyword_description": "제목, 내용, URL 및 메모에서 정확한 단어림 찾습니다. 거의 즉각적입니다.",
+    "mode_keyword_description": "제목, 내용, URL 및 메모에서 정확히 일치하는 단어를 찾습니다. 거의 즉시 검색됩니다.",
     "mode_hybrid": "하이브리드",
-    "mode_hybrid_description": "정확한 일치와 관련 내용을 혼합하여 최적의 결과림 냅니다. 키워드 검색보다는 다쇌 단립니다.",
-    "mode_semantic": "시맨택(의미)",
-    "mode_semantic_description": "동일한 단어가 없도록 개념적으로 유사한 북마탌을 찾습니다. 키워드 검색보다는 다쇌 단립니다.",
+    "mode_hybrid_description": "정확한 일치 결과와 관련 아이디어를 결합하여 최적의 균형을 제공합니다. 키워드 검색보다 느립니다.",
+    "mode_semantic": "시맨틱",
+    "mode_semantic_description": "공통 단어가 없어도 개념적으로 유사한 북마크를 찾습니다. 키워드 검색보다 느립니다.",
     "keyword_placeholder": "제목, 본문, URL, 태그 검색…",
     "hybrid_placeholder": "단어 또는 의미로 검색…",
     "semantic_placeholder": "기억나는 내용을 설명해 보세요…"
@@ -724,7 +724,7 @@
         "staging": "준비 중",
         "running": "실행 중",
         "paused": "일시 중단됨",
-        "archived": "보츀됨"
+        "archived": "보관됨"
       },
       "badges": {
         "pending": "{{count}} 대기 중",
@@ -762,7 +762,7 @@
         "view_bookmark": "북마크 보기",
         "load_more": "더 불러오기",
         "no_title": "제목 없음",
-        "archived_results": "보츀된 가져오기 세션의 개별 북마탌 결과는 더 이상 유지되지 않습니다."
+        "archived_results": "보관된 가져오기 세션의 개별 북마크 결과는 더 이상 유지되지 않습니다."
       },
       "finalize_dialog_title": "가져오기 세션 완료",
       "finalize_dialog_description": "\"{{name}}\"을(를) 백그라운드 작업 대기열에 추가할까요? 준비된 북마크 가져오기가 시작됩니다.",

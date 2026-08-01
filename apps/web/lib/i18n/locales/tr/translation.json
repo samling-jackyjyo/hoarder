@@ -1091,7 +1091,7 @@
     "is_from_source": "Kaynak",
     "is_not_from_source": "Kaynak değil",
     "mode_label": "Arama modu",
-    "mode_label_description": "Karakeep'in eşlesen yer işaretlerini nasıl bulacağını seçin.",
+    "mode_label_description": "Karakeep'in eşleşen yer işaretlerini nasıl bulacağını seçin.",
     "mode_keyword": "Anahtar kelime",
     "mode_keyword_description": "Başlıklarda, içerikte, URL'lerde ve notlarda tam kelimeleri eşleştirin. Neredeyse anlık.",
     "mode_hybrid": "Hibrit",

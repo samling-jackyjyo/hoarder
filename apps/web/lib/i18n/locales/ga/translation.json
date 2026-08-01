@@ -789,7 +789,7 @@
     "is_not_from_source": "Ní foinse é foinse ní",
     "mode_label": "Mód cuardaigh",
     "mode_label_description": "Roghnaigh an chaoi a bhfaigheann Karakeep leabharmharcanna comheala.",
-    "mode_keyword": "Loch Príomhfhocal",
+    "mode_keyword": "Eochairfhocal",
     "mode_keyword_description": "Meaitseáil focail bheacht i dteidil, in ábhar, in URLanna, agus i nótaí. Beagnach an mheandar.",
     "mode_hybrid": "Hibrideach",
     "mode_hybrid_description": "Cumasc meaitseanna beachta le smaointe gaolmhara le haghaidh an chothromaíocht is fearr. Níos moille ná cuardach eochairfhocal.",
@@ -1109,7 +1109,7 @@
     "bookmarks": {
       "delete_confirmation_title": "Scrios Leabharmharc?",
       "delete_confirmation_description": "An bhfuil tú cinnte gur mhaith leat an leabhar marcála seo a scriosadh?",
-      "bulk_delete_confirmation_description": "An bhfuil tú cinnte gur mhaith leat {{count}} leabharmhailc a scriosadh?"
+      "bulk_delete_confirmation_description": "An bhfuil tú cinnte gur mhaith leat {{count}} leabharmharc a scriosadh?"
     }
   },
   "banners": {
@@ -1210,10 +1210,10 @@
     "move_right": "Bog ar dheis",
     "open_bookmark": "Oscail leabharmharc",
     "clear_focus": "Glan an fócas / scoir an mór-eagarthóireacht",
-    "toggle_favorite": "Scorthaigh an ceanán",
+    "toggle_favorite": "Scoránaigh an ceanán",
     "toggle_archive": "Cartlannaigh / Dí-chartlannaigh",
     "delete_bookmark": "Scrios leabharmharc",
-    "toggle_selection": "Scorthaigh an roghnú",
+    "toggle_selection": "Scoránaigh an roghnú",
     "select_all": "Roghnaigh uile",
     "deselect_all": "Díroghnaigh uile",
     "show_help": "Taispeáin aicearraí méarchláir",

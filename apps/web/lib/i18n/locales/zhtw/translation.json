@@ -562,7 +562,7 @@
         "view_bookmark": "檢視書籤",
         "load_more": "載入更多",
         "no_title": "無標題",
-        "archived_results": "目前不再為封存的叟入會話保留個別書籤結果。"
+        "archived_results": "目前不再為封存的匯入會話保留個別書籤結果。"
       },
       "finalize_dialog_title": "完成匯入工作階段",
       "finalize_dialog_description": "將「{{name}}」放入背景處理佇列？暫存的書籤將開始匯入。",
@@ -1103,7 +1103,7 @@
     "bookmarks": {
       "delete_confirmation_title": "刪除書籤？",
       "delete_confirmation_description": "您確定要刪除這個書籤嗎？",
-      "bulk_delete_confirmation_description": "您確定要刪除 {{count}} 個書籪嗎？"
+      "bulk_delete_confirmation_description": "您確定要刪除 {{count}} 個書籤嗎？"
     }
   },
   "highlights": {
@@ -1208,11 +1208,11 @@
     "move_down": "向下移動",
     "move_up": "向上移動",
     "move_right": "向右移動",
-    "open_bookmark": "寅開書籪",
+    "open_bookmark": "開啟書籤",
     "clear_focus": "清除焦點 / 退出批量編輯",
     "toggle_favorite": "切換收藏",
     "toggle_archive": "封存 / 取消封存",
-    "delete_bookmark": "刪除書籪",
+    "delete_bookmark": "刪除書籤",
     "toggle_selection": "切換選取",
     "select_all": "全選",
     "deselect_all": "取消全選",

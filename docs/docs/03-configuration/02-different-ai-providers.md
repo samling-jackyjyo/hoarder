@@ -1,8 +1,10 @@
 # Configuring different AI Providers
 
-Karakeep uses LLM providers for AI tagging and summarization. We support OpenAI-compatible providers and ollama. This guide will show you how to configure different providers.
+Karakeep uses LLM providers for AI tagging and summarization. It also uses embedding models for stuff like semantic search. We support OpenAI-compatible providers and ollama. This guide will show you how to configure different providers.
 
-## OpenAI
+## Tagging and Summarization Models
+
+### OpenAI
 
 If you want to use OpenAI itself, you just need to pass in the OPENAI_API_KEY environment variable.
 
@@ -14,9 +16,11 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # INFERENCE_IMAGE_MODEL=gpt-4o-mini
 # EMBEDDING_TEXT_MODEL=text-embedding-3-small
 # EMBEDDING_DIMENSIONS=1536
+# EMBEDDING_TEXT_MODEL_DIMENSION_OVERRIDE=1536
 ```
 
-## Ollama
+
+### Ollama
 
 Ollama is a local LLM provider that you can use to run your own LLM server. You'll need to pass ollama's address to karakeep and you need to ensure that it's accessible from within the karakeep container (e.g. no localhost addresses).
 
@@ -25,7 +29,7 @@ Ollama provides two API endpoints:
 1. **OpenAI-compatible API (Recommended)** - Uses the `/v1` chat endpoint which handles message formatting automatically
 2. **Native Ollama API** - Requires manual formatting for some models
 
-### Option 1: OpenAI-compatible API (Recommended)
+#### Option 1: OpenAI-compatible API (Recommended)
 
 This approach uses Ollama's OpenAI-compatible endpoint and is more reliable with various models:
 
@@ -41,7 +45,7 @@ EMBEDDING_DIMENSIONS=768
 EMBEDDING_CONTEXT_LENGTH=2048
 ```
 
-### Option 2: Native Ollama API
+#### Option 2: Native Ollama API
 
 Alternatively, you can use the native Ollama API:
 
@@ -65,7 +69,7 @@ EMBEDDING_CONTEXT_LENGTH=2048
 If you experience issues with certain models (especially OpenAI's gpt-oss models or other models requiring specific chat formats), try using the OpenAI-compatible API endpoint instead.
 :::
 
-## Gemini
+### Gemini
 
 Gemini has an OpenAI-compatible API. You need to get an api key from Google AI Studio. You also need to set up a billing account, even if using the free tier.
 
@@ -82,7 +86,7 @@ EMBEDDING_DIMENSIONS=3072
 
 ```
 
-## OpenRouter
+### OpenRouter
 
 ```
 OPENAI_BASE_URL=https://openrouter.ai/api/v1
@@ -94,7 +98,7 @@ INFERENCE_IMAGE_MODEL=meta-llama/llama-4-scout
 EMBEDDING_TEXT_MODEL=openai/text-embedding-3-small
 ```
 
-## Perplexity
+### Perplexity
 
 ```
 OPENAI_BASE_URL=https://api.perplexity.ai
@@ -103,7 +107,7 @@ INFERENCE_TEXT_MODEL=sonar-pro
 INFERENCE_IMAGE_MODEL=sonar-pro
 ```
 
-## Azure
+### Azure
 
 Azure has an OpenAI-compatible API.
 
@@ -125,7 +129,7 @@ INFERENCE_TEXT_MODEL=YOUR_DEPLOYMENT_NAME
 INFERENCE_IMAGE_MODEL=YOUR_DEPLOYMENT_NAME
 ```
 
-## Cloudflare
+### Cloudflare
 
 Cloudflare supports OpenAI compatible endpoints. You can generate an API Token from the Cloudflare dashboard (Workers AI).
 
@@ -143,7 +147,7 @@ INFERENCE_OUTPUT_SCHEMA=json
 ```
 
 
-# Configuring Embedding Models
+## Embedding Models
 
 Karakeep uses embedding models for stuff like semantic search and refining tag suggestions. Typically, when you configure an embedding model, you'll want to configure its default num dimensions and context length. Those are done via:
 
@@ -153,6 +157,20 @@ EMBEDDING_DIMENSIONS=
 EMBEDDING_CONTEXT_LENGTH=
 ```
 
+
+Embeddings can use a different OpenAI-compatible provider. Set either override independently; any unset value falls back to its corresponding `OPENAI_*` setting.
+
+```
+EMBEDDING_OPENAI_API_KEY=embedding-provider-api-key
+EMBEDDING_OPENAI_BASE_URL=https://embedding-provider.example.com/v1
+```
+
+For embedding models that support multiple output sizes, set `EMBEDDING_TEXT_MODEL_DIMENSION_OVERRIDE` to pass the requested dimensions to the provider. Its value must match `EMBEDDING_DIMENSIONS`, which configures the vector store, or Karakeep will fail to start:
+
+```
+EMBEDDING_TEXT_MODEL_DIMENSION_OVERRIDE=768
+EMBEDDING_DIMENSIONS=768
+```
 
 Once you've configured an embedding model, you'll also want to enable auto-embedding generation for your bookmarks by:
 

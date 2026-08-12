@@ -8,7 +8,6 @@ import {
   eq,
   getTableColumns,
   gt,
-  gte,
   inArray,
   lt,
   lte,
@@ -477,7 +476,7 @@ export class Bookmark extends BareBookmark {
           gt(createdAtCol, input.cursor.createdAt),
           and(
             eq(createdAtCol, input.cursor.createdAt),
-            gte(idCol, input.cursor.id),
+            lte(idCol, input.cursor.id),
           ),
         );
       }

@@ -59,50 +59,52 @@ function getErrorMessage(error: unknown): string {
 
 export const FeedRefreshingWorker = cron.schedule(
   "0 * * * *",
-  () => {
+  async () => {
     logger.info("[feed] Scheduling feed refreshing jobs ...");
-    db.query.rssFeedsTable
-      .findMany({
+    try {
+      const feeds = await db.query.rssFeedsTable.findMany({
         columns: {
           id: true,
           userId: true,
         },
         where: eq(rssFeedsTable.enabled, true),
-      })
-      .then((feeds) => {
-        const currentHour = new Date();
-        currentHour.setMinutes(0, 0, 0);
-        const hourlyWindow = currentHour.toISOString();
-        const now = new Date();
-        const currentMinute = now.getMinutes();
-
-        for (const feed of feeds) {
-          const idempotencyKey = `${feed.id}-${hourlyWindow}`;
-          const targetMinute = getFeedMinuteOffset(feed.id);
-
-          // Calculate delay: if target minute has passed, schedule for next hour
-          let delayMinutes = targetMinute - currentMinute;
-          if (delayMinutes < 0) {
-            delayMinutes += 60;
-          }
-          const delayMs = delayMinutes * 60 * 1000;
-
-          logger.debug(
-            `[feed] Scheduling feed ${feed.id} at minute ${targetMinute} (delay: ${delayMinutes} minutes)`,
-          );
-
-          FeedQueue.enqueue(
-            {
-              feedId: feed.id,
-            },
-            {
-              idempotencyKey,
-              groupId: feed.userId,
-              delayMs,
-            },
-          );
-        }
       });
+
+      const currentHour = new Date();
+      currentHour.setMinutes(0, 0, 0);
+      const hourlyWindow = currentHour.toISOString();
+      const now = new Date();
+      const currentMinute = now.getMinutes();
+
+      for (const feed of feeds) {
+        const idempotencyKey = `${feed.id}-${hourlyWindow}`;
+        const targetMinute = getFeedMinuteOffset(feed.id);
+
+        // Calculate delay: if target minute has passed, schedule for next hour
+        let delayMinutes = targetMinute - currentMinute;
+        if (delayMinutes < 0) {
+          delayMinutes += 60;
+        }
+        const delayMs = delayMinutes * 60 * 1000;
+
+        logger.debug(
+          `[feed] Scheduling feed ${feed.id} at minute ${targetMinute} (delay: ${delayMinutes} minutes)`,
+        );
+
+        await FeedQueue.enqueue(
+          {
+            feedId: feed.id,
+          },
+          {
+            idempotencyKey,
+            groupId: feed.userId,
+            delayMs,
+          },
+        );
+      }
+    } catch (error) {
+      logger.error(`[feed] Error scheduling feed refreshing jobs: ${error}`);
+    }
   },
   {
     runOnInit: false,

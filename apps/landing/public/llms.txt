@@ -68,7 +68,8 @@ Run Karakeep on your own infrastructure using Docker, Kubernetes, or a supported
 Use the managed Karakeep service without running your own server.
 
 - [Karakeep Cloud](https://cloud.karakeep.app)
-- [Pricing](https://karakeep.app/pricing)
+- [Pricing (Markdown)](https://karakeep.app/pricing.md)
+- [Pricing (HTML)](https://karakeep.app/pricing)
 
 ## Apps and extensions
 

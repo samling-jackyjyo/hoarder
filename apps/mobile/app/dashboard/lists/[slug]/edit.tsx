@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
+import { ListParentField } from "@/components/lists/list-parent-field";
 import QueryPageState from "@/components/QueryPageState";
 import { Button } from "@/components/ui/Button";
 import { EmojiPicker } from "@/components/ui/emoji-picker";
@@ -8,16 +9,21 @@ import FullPageSpinner from "@/components/ui/FullPageSpinner";
 import { Input } from "@/components/ui/Input";
 import { Text } from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast";
+import { NO_PARENT_VALUE } from "@/lib/list-parent-selection";
 import { useQuery } from "@tanstack/react-query";
 
 import { useEditBookmarkList } from "@karakeep/shared-react/hooks/lists";
 import { useTRPC } from "@karakeep/shared-react/trpc";
 
 const EditListPage = () => {
-  const { slug: listId } = useLocalSearchParams<{ slug?: string | string[] }>();
+  const { slug: listId, selectedParentId } = useLocalSearchParams<{
+    slug?: string | string[];
+    selectedParentId?: string | string[];
+  }>();
   const [text, setText] = useState("");
   const [icon, setIcon] = useState("📁");
   const [query, setQuery] = useState("");
+  const [parentId, setParentId] = useState<string | null>(null);
   const { toast } = useToast();
   const api = useTRPC();
   const { mutate, isPending: editIsPending } = useEditBookmarkList({
@@ -64,7 +70,14 @@ const EditListPage = () => {
     setText(list.name ?? "");
     setIcon(list.icon || "📁");
     setQuery(list.query ?? "");
-  }, [list?.icon, list?.id, list?.query, list?.name]);
+    setParentId(list.parentId);
+  }, [list?.icon, list?.id, list?.parentId, list?.query, list?.name]);
+
+  useEffect(() => {
+    if (typeof selectedParentId !== "string") return;
+    setParentId(selectedParentId === NO_PARENT_VALUE ? null : selectedParentId);
+    router.setParams({ selectedParentId: undefined });
+  }, [selectedParentId]);
 
   const onSubmit = () => {
     if (!text.trim()) {
@@ -84,6 +97,7 @@ const EditListPage = () => {
       listId,
       name: text.trim(),
       icon,
+      parentId,
       query: list?.type === "smart" ? query.trim() : undefined,
     });
   };
@@ -136,6 +150,21 @@ const EditListPage = () => {
             placeholder="Reading list"
             autoFocus
             autoCapitalize="sentences"
+          />
+
+          <ListParentField
+            value={parentId}
+            onPress={() =>
+              router.push({
+                pathname: "/dashboard/lists/select-parent",
+                params: {
+                  returnTo: "edit",
+                  listId,
+                  selectedParentId: parentId ?? NO_PARENT_VALUE,
+                  hideSubtreeOf: listId,
+                },
+              })
+            }
           />
 
           {/* Smart List Query Input */}

@@ -179,6 +179,15 @@ export default function Dashboard() {
         }}
       />
       <Stack.Screen
+        name="lists/select-parent"
+        options={{
+          headerTitle: "Parent List",
+          headerBackTitle: "Back",
+          headerLargeTitle: false,
+          headerTransparent: false,
+        }}
+      />
+      <Stack.Screen
         name="archive"
         options={{
           headerTitle: "🗄️ Archive",

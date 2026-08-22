@@ -291,6 +291,21 @@ export default function Settings() {
         </View>
       </View>
 
+      <SectionHeader title="Library" />
+      <View
+        className="w-full overflow-hidden rounded-xl bg-card"
+        style={{ borderCurve: "continuous" }}
+      >
+        <Link asChild href="/dashboard/settings/usage">
+          <Pressable className="flex flex-row items-center px-4 py-3">
+            <Text className="mr-2 flex-1" numberOfLines={1}>
+              Usage statistics
+            </Text>
+            <ChevronRight />
+          </Pressable>
+        </Link>
+      </View>
+
       <SectionHeader title="Account" />
       <View
         className="w-full rounded-xl bg-card py-2"

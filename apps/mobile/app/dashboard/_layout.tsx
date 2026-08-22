@@ -233,6 +233,15 @@ export default function Dashboard() {
         }}
       />
       <Stack.Screen
+        name="settings/usage"
+        options={{
+          title: "Usage Statistics",
+          headerTitle: "Usage Statistics",
+          headerBackTitle: "Back",
+          headerLargeTitle: false,
+        }}
+      />
+      <Stack.Screen
         name="settings/toolbar-settings"
         options={{
           title: "Toolbar Buttons",

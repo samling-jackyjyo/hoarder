@@ -326,6 +326,9 @@ importers:
 
   apps/mobile:
     dependencies:
+      '@emoji-mart/data':
+        specifier: ^1.1.2
+        version: 1.1.2
       '@expo/dom-webview':
         specifier: ~56.0.6
         version: 56.0.6(expo@56.0.15)(react-native@0.85.3(patch_hash=7d74c7fbd33e9f3f3f8a8ba47a013acfc098948e39c7faab1232e6edca358ac1)(@babel/core@7.29.0)(@react-native/metro-config@0.85.3(@babel/core@7.29.0))(@types/react@19.2.15)(react@19.2.3))(react@19.2.3)

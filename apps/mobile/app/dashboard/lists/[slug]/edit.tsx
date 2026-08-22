@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import QueryPageState from "@/components/QueryPageState";
 import { Button } from "@/components/ui/Button";
+import { EmojiPicker } from "@/components/ui/emoji-picker";
 import FullPageSpinner from "@/components/ui/FullPageSpinner";
 import { Input } from "@/components/ui/Input";
 import { Text } from "@/components/ui/Text";
@@ -15,6 +16,7 @@ import { useTRPC } from "@karakeep/shared-react/trpc";
 const EditListPage = () => {
   const { slug: listId } = useLocalSearchParams<{ slug?: string | string[] }>();
   const [text, setText] = useState("");
+  const [icon, setIcon] = useState("📁");
   const [query, setQuery] = useState("");
   const { toast } = useToast();
   const api = useTRPC();
@@ -60,8 +62,9 @@ const EditListPage = () => {
   useEffect(() => {
     if (!list) return;
     setText(list.name ?? "");
+    setIcon(list.icon || "📁");
     setQuery(list.query ?? "");
-  }, [list?.id, list?.query, list?.name]);
+  }, [list?.icon, list?.id, list?.query, list?.name]);
 
   const onSubmit = () => {
     if (!text.trim()) {
@@ -80,6 +83,7 @@ const EditListPage = () => {
     mutate({
       listId,
       name: text.trim(),
+      icon,
       query: list?.type === "smart" ? query.trim() : undefined,
     });
   };
@@ -93,7 +97,11 @@ const EditListPage = () => {
       {editIsPending ? (
         <FullPageSpinner />
       ) : (
-        <View className="gap-3 px-4">
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardShouldPersistTaps="handled"
+          contentContainerClassName="gap-4 px-4 pb-8"
+        >
           {/* List Type Info - not editable */}
           <View className="gap-2">
             <Text className="text-sm text-muted-foreground">List Type</Text>
@@ -117,18 +125,18 @@ const EditListPage = () => {
             </View>
           </View>
 
-          {/* List Name */}
-          <View className="flex flex-row items-center gap-1">
-            <Text className="shrink p-2">{list?.icon || "🚀"}</Text>
-            <Input
-              className="flex-1 bg-card"
-              onChangeText={setText}
-              value={text}
-              placeholder="List Name"
-              autoFocus
-              autoCapitalize={"none"}
-            />
-          </View>
+          <EmojiPicker value={icon} onChange={setIcon} />
+
+          <Input
+            className="bg-card"
+            label="List Name"
+            labelClasses="text-sm text-muted-foreground"
+            onChangeText={setText}
+            value={text}
+            placeholder="Reading list"
+            autoFocus
+            autoCapitalize="sentences"
+          />
 
           {/* Smart List Query Input */}
           {list?.type === "smart" && (
@@ -153,7 +161,7 @@ const EditListPage = () => {
           <Button disabled={editIsPending} onPress={onSubmit}>
             <Text>Save</Text>
           </Button>
-        </View>
+        </ScrollView>
       )}
     </>
   );

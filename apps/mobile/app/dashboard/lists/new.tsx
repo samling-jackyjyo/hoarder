@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { router } from "expo-router";
 import { Button } from "@/components/ui/Button";
+import { EmojiPicker } from "@/components/ui/emoji-picker";
 import { Input } from "@/components/ui/Input";
 import { Text } from "@/components/ui/Text";
 import { useToast } from "@/components/ui/Toast";
@@ -16,6 +17,7 @@ const NewListPage = () => {
   };
   const { toast } = useToast();
   const [text, setText] = useState("");
+  const [icon, setIcon] = useState("📁");
   const [listType, setListType] = useState<ListType>("manual");
   const [query, setQuery] = useState("");
 
@@ -52,14 +54,18 @@ const NewListPage = () => {
 
     mutate({
       name: text,
-      icon: "📁",
+      icon,
       type: listType,
       query: listType === "smart" ? query : undefined,
     });
   };
 
   return (
-    <View className="gap-3 px-4">
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      keyboardShouldPersistTaps="handled"
+      contentContainerClassName="gap-4 px-4 pb-8"
+    >
       {/* List Type Selector */}
       <View className="gap-2">
         <Text className="text-sm text-muted-foreground">List Type</Text>
@@ -83,17 +89,17 @@ const NewListPage = () => {
         </View>
       </View>
 
-      {/* List Name */}
-      <View className="flex flex-row items-center gap-1">
-        <Text className="shrink p-2">📁</Text>
-        <Input
-          className="flex-1 bg-card"
-          onChangeText={setText}
-          placeholder="List Name"
-          autoFocus
-          autoCapitalize={"none"}
-        />
-      </View>
+      <EmojiPicker value={icon} onChange={setIcon} />
+
+      <Input
+        className="bg-card"
+        label="List Name"
+        labelClasses="text-sm text-muted-foreground"
+        onChangeText={setText}
+        placeholder="Reading list"
+        autoFocus
+        autoCapitalize="sentences"
+      />
 
       {/* Smart List Query Input */}
       {listType === "smart" && (
@@ -115,7 +121,7 @@ const NewListPage = () => {
       <Button disabled={isPending} onPress={onSubmit}>
         <Text>Save</Text>
       </Button>
-    </View>
+    </ScrollView>
   );
 };
 

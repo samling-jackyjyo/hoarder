@@ -501,6 +501,7 @@ const serverConfigSchema = allEnv.transform((val, ctx) => {
       },
     },
     prometheus: {
+      enabled: val.PROMETHEUS_AUTH_TOKEN !== undefined,
       metricsToken:
         val.PROMETHEUS_AUTH_TOKEN ?? crypto.randomBytes(64).toString("hex"),
     },

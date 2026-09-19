@@ -162,7 +162,8 @@ const allEnv = z.object({
   CRAWLER_DOMAIN_RATE_LIMIT_MAX_REQUESTS: z.coerce.number().min(1).optional(),
   CRAWLER_PREFLIGHT_USER_AGENT: z.string().optional(),
   LOG_LEVEL: z.string().default("debug"),
-  NO_COLOR: stringBool("false"),
+  // https://no-color.org/: any nonempty value disables colors.
+  NO_COLOR: z.string().optional().transform(Boolean),
   DEMO_MODE: stringBool("false"),
   DEMO_MODE_EMAIL: z.string().optional(),
   DEMO_MODE_PASSWORD: z.string().optional(),

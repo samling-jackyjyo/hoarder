@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  tailwindcss@3.4.1>postcss-selector-parser: 6.1.4
   openapi-to-postmanv2@6>js-yaml: 4.3.2
   openapi-to-postmanv2@6>yaml: 1.10.3
   '@opentelemetry/core@>=2.0.0 <2.8.0': 2.8.0
